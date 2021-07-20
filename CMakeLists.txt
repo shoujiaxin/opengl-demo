@@ -3,4 +3,12 @@ project(learn_opengl)
 
 set(CMAKE_CXX_STANDARD 11)
 
+# GLFW
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(third_party/glfw)
+
 add_executable(learn_opengl src/main.cpp)
+
+target_link_libraries(learn_opengl glfw)
