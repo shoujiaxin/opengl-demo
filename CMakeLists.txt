@@ -9,6 +9,8 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/glfw)
 
-add_executable(learn_opengl src/main.cpp)
+include_directories(include)
+
+add_executable(learn_opengl src/main.cpp src/glad.c)
 
 target_link_libraries(learn_opengl glfw)
