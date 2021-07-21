@@ -8,6 +8,9 @@
 #include "program.h"
 #include "shader.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
