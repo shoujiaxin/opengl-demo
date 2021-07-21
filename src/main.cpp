@@ -89,7 +89,7 @@ int main() {
   glLinkProgram(shader_program);
   glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
   if (!success) {
-    glGetShaderInfoLog(shader_program, 512, nullptr, info_log);
+    glGetProgramInfoLog(shader_program, 512, nullptr, info_log);
     std::cerr << "Link program failed: " << info_log << std::endl;
   }
   glDeleteShader(vertex_shader);
