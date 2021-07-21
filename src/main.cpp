@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "program.h"
+#include "shader.h"
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
@@ -46,8 +47,9 @@ int main() {
     return -1;
   }
 
-  auto shader = Program("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.vs",
-                        "/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.fs");
+  auto program =
+      Program(VertexShader("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.vs"),
+              FragmentShader("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.fs"));
 
   // 顶点数据
   const float vertices[] = {
@@ -101,7 +103,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // 激活着色器程序
-    shader.Use();
+    program.Use();
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
@@ -120,7 +122,6 @@ int main() {
   glDeleteVertexArrays(1, &vertex_array_object);
   glDeleteBuffers(1, &vertex_buffer_object);
   glDeleteBuffers(1, &element_buffer_object);
-  shader.Delete();
 
   glfwTerminate();
   return 0;

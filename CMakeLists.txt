@@ -11,6 +11,6 @@ add_subdirectory(third_party/glfw)
 
 include_directories(include)
 
-add_executable(learn_opengl src/main.cpp src/glad.c src/program.cpp)
+add_executable(learn_opengl src/main.cpp src/glad.c src/program.cpp src/shader.cpp)
 
 target_link_libraries(learn_opengl glfw)
