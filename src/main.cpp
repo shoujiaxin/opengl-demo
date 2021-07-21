@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 // clang-format on
+#include <cmath>
 #include <iostream>
 
 #define SCR_WIDTH 800
@@ -46,9 +47,9 @@ int main() {
   // 顶点着色器
   const char* vertex_shader_source =
       "#version 330 core\n"
-      "layout (location = 0) in vec3 aPos;\n"
+      "layout (location = 0) in vec3 aPos;\n"  // 位置变量的属性位置值为 0
       "void main() {\n"
-      "  gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+      "  gl_Position = vec4(aPos, 1.0);\n"
       "}\n";
   auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
@@ -58,15 +59,16 @@ int main() {
   glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vertex_shader, 512, nullptr, info_log);
-    std::cerr << info_log << std::endl;
+    std::cerr << "Compile vertex shader failed: " << info_log << std::endl;
   }
 
   // 片段着色器
   const char* fragment_shader_source =
       "#version 330 core\n"
       "out vec4 FragColor;\n"
+      "uniform vec4 ourColor;"
       "void main() {\n"
-      "  FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);"
+      "  FragColor = ourColor;"
       "}\n";
   auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
@@ -74,7 +76,7 @@ int main() {
   glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fragment_shader, 512, nullptr, info_log);
-    std::cerr << info_log << std::endl;
+    std::cerr << "Compile fragment shader failed: " << info_log << std::endl;
   }
 
   // 着色器程序
@@ -85,7 +87,7 @@ int main() {
   glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader_program, 512, nullptr, info_log);
-    std::cerr << info_log << std::endl;
+    std::cerr << "Link program failed: " << info_log << std::endl;
   }
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
@@ -130,15 +132,25 @@ int main() {
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
+    // 输入
     HandleInput(window);
 
+    // 清除颜色缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // 激活着色器程序
     glUseProgram(shader_program);
+
+    const auto time_value = glfwGetTime();
+    const auto green_value = sin(time_value / 2.0f) + 0.5f;
+    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
+    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
+
+    // 绘制图形
     glBindVertexArray(vertex_array_object);
-    //    glDrawArrays(GL_TRIANGLES, 0, 3);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
+    //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);// 矩形
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
     glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）
