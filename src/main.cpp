@@ -28,8 +28,7 @@ int main() {
 #endif
 
   // 创建窗口
-  auto window =
-      glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learn OpenGL", nullptr, nullptr);
+  auto window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learn OpenGL", nullptr, nullptr);
   if (window == nullptr) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
@@ -91,19 +90,43 @@ int main() {
   glDeleteShader(vertex_shader);
   glDeleteShader(fragment_shader);
 
-  // 顶点数组对象
-  unsigned int vertex_array_object;
+  // 顶点数据
+  float vertices[] = {
+      0.5f,  0.5f,  0.0f,  // 右上角
+      0.5f,  -0.5f, 0.0f,  // 右下角
+      -0.5f, -0.5f, 0.0f,  // 左下角
+      -0.5f, 0.5f,  0.0f   // 左上角
+  };
+  unsigned int indices[] = {
+      0, 1, 3,  // 第一个三角形
+      1, 2, 3   // 第二个三角形
+  };
+
+  unsigned int vertex_array_object;    // 顶点数组对象
+  unsigned int vertex_buffer_object;   // 顶点缓冲对象
+  unsigned int element_buffer_object;  // 索引缓冲对象
   glGenVertexArrays(1, &vertex_array_object);
+  glGenBuffers(1, &vertex_buffer_object);
+  glGenBuffers(1, &element_buffer_object);
+
   glBindVertexArray(vertex_array_object);
 
-  // 顶点数据
-  float vertices[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f, 0.0f, 0.0f, 0.5f, 0.0f};
-  unsigned int vertex_buffer_object;  // 顶点缓冲对象
-  glGenBuffers(1, &vertex_buffer_object);
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
+
+  glBindBuffer(GL_ARRAY_BUFFER, 0);  // 解绑顶点缓冲对象
+  glBindVertexArray(0);              // 解绑顶点数组对象
+
+  // 线框模式
+  //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+  // 默认模式
+  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
@@ -114,11 +137,17 @@ int main() {
 
     glUseProgram(shader_program);
     glBindVertexArray(vertex_array_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    //    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
-    glfwPollEvents();  // 检查触发事件（键盘输入、鼠标移动等）
+    glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）
   }
+
+  glDeleteVertexArrays(1, &vertex_array_object);
+  glDeleteBuffers(1, &vertex_buffer_object);
+  glDeleteBuffers(1, &element_buffer_object);
+  glDeleteProgram(shader_program);
 
   glfwTerminate();
   return 0;
