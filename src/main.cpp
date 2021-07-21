@@ -1,9 +1,11 @@
 // clang-format off
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
 // clang-format on
 #include <cmath>
 #include <iostream>
+
+#include "program.h"
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
@@ -44,56 +46,8 @@ int main() {
     return -1;
   }
 
-  // 顶点着色器
-  const char* vertex_shader_source =
-      "#version 330 core\n"
-      "layout (location = 0) in vec3 aPos;\n"    // 位置变量的属性位置值为 0
-      "layout (location = 1) in vec3 aColor;\n"  // 颜色变量的属性位置值为 0
-      "out vec3 ourColor;\n"                     // 向片段着色器输出一个颜色
-      "void main() {\n"
-      "  gl_Position = vec4(aPos, 1.0);\n"
-      "  ourColor = aColor;"  // 从顶点数据获取颜色
-      "}\n";
-  auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-  glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
-  glCompileShader(vertex_shader);
-  int success;
-  char info_log[512];
-  glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(vertex_shader, 512, nullptr, info_log);
-    std::cerr << "Compile vertex shader failed: " << info_log << std::endl;
-  }
-
-  // 片段着色器
-  const char* fragment_shader_source =
-      "#version 330 core\n"
-      "out vec4 FragColor;\n"
-      "in vec3 ourColor;"
-      "void main() {\n"
-      "  FragColor = vec4(ourColor, 1.0);"
-      "}\n";
-  auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
-  glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
-  glCompileShader(fragment_shader);
-  glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &success);
-  if (!success) {
-    glGetShaderInfoLog(fragment_shader, 512, nullptr, info_log);
-    std::cerr << "Compile fragment shader failed: " << info_log << std::endl;
-  }
-
-  // 着色器程序
-  auto shader_program = glad_glCreateProgram();
-  glAttachShader(shader_program, vertex_shader);
-  glAttachShader(shader_program, fragment_shader);
-  glLinkProgram(shader_program);
-  glGetProgramiv(shader_program, GL_LINK_STATUS, &success);
-  if (!success) {
-    glGetProgramInfoLog(shader_program, 512, nullptr, info_log);
-    std::cerr << "Link program failed: " << info_log << std::endl;
-  }
-  glDeleteShader(vertex_shader);
-  glDeleteShader(fragment_shader);
+  auto shader = Program("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.vs",
+                        "/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.fs");
 
   // 顶点数据
   const float vertices[] = {
@@ -147,7 +101,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // 激活着色器程序
-    glUseProgram(shader_program);
+    shader.Use();
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
@@ -166,7 +120,7 @@ int main() {
   glDeleteVertexArrays(1, &vertex_array_object);
   glDeleteBuffers(1, &vertex_buffer_object);
   glDeleteBuffers(1, &element_buffer_object);
-  glDeleteProgram(shader_program);
+  shader.Delete();
 
   glfwTerminate();
   return 0;
