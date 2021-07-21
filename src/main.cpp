@@ -47,9 +47,12 @@ int main() {
   // 顶点着色器
   const char* vertex_shader_source =
       "#version 330 core\n"
-      "layout (location = 0) in vec3 aPos;\n"  // 位置变量的属性位置值为 0
+      "layout (location = 0) in vec3 aPos;\n"    // 位置变量的属性位置值为 0
+      "layout (location = 1) in vec3 aColor;\n"  // 颜色变量的属性位置值为 0
+      "out vec3 ourColor;\n"                     // 向片段着色器输出一个颜色
       "void main() {\n"
       "  gl_Position = vec4(aPos, 1.0);\n"
+      "  ourColor = aColor;"  // 从顶点数据获取颜色
       "}\n";
   auto vertex_shader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertex_shader, 1, &vertex_shader_source, nullptr);
@@ -66,9 +69,9 @@ int main() {
   const char* fragment_shader_source =
       "#version 330 core\n"
       "out vec4 FragColor;\n"
-      "uniform vec4 ourColor;"
+      "in vec3 ourColor;"
       "void main() {\n"
-      "  FragColor = ourColor;"
+      "  FragColor = vec4(ourColor, 1.0);"
       "}\n";
   auto fragment_shader = glCreateShader(GL_FRAGMENT_SHADER);
   glShaderSource(fragment_shader, 1, &fragment_shader_source, nullptr);
@@ -93,13 +96,13 @@ int main() {
   glDeleteShader(fragment_shader);
 
   // 顶点数据
-  float vertices[] = {
-      0.5f,  0.5f,  0.0f,  // 右上角
-      0.5f,  -0.5f, 0.0f,  // 右下角
-      -0.5f, -0.5f, 0.0f,  // 左下角
-      -0.5f, 0.5f,  0.0f   // 左上角
+  const float vertices[] = {
+      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f,  // 右上角
+      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // 右下角
+      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // 左下角
+      -0.5f, 0.5f,  0.0f, 0.5f, 0.5f, 0.5f   // 左上角
   };
-  unsigned int indices[] = {
+  const unsigned int indices[] = {
       0, 1, 3,  // 第一个三角形
       1, 2, 3   // 第二个三角形
   };
@@ -119,8 +122,12 @@ int main() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  // 位置属性
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
   glEnableVertexAttribArray(0);
+  // 颜色属性
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);  // 解绑顶点缓冲对象
   glBindVertexArray(0);              // 解绑顶点数组对象
@@ -142,10 +149,10 @@ int main() {
     // 激活着色器程序
     glUseProgram(shader_program);
 
-    const auto time_value = glfwGetTime();
-    const auto green_value = sin(time_value / 2.0f) + 0.5f;
-    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
-    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
+    //    const auto time_value = glfwGetTime();
+    //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
+    //    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
+    //    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);
