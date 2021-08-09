@@ -10,13 +10,15 @@
 
 class Shader {
  public:
-  unsigned int id;
-
   ~Shader();
 
   void Delete() const;
 
+  unsigned int Id() const;
+
  protected:
+  unsigned int id_;
+
   void Compile(const std::string& source) const;
 
   static std::string LoadSourceFrom(const std::string& path);

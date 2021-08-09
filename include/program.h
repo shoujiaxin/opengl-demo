@@ -8,14 +8,15 @@
 
 class Program {
  public:
-  unsigned int id;
-
   Program();
 
   Program(const Shader& vertex_shader, const Shader& fragment_shader);
 
   ~Program();
 
+  void Use() const;
+
+ private:
   void AttachShader(const Shader& shader) const;
 
   void Delete() const;
@@ -28,5 +29,5 @@ class Program {
 
   void SetUniform(const std::string& name, float value) const;
 
-  void Use() const;
+  unsigned int id_;
 };
