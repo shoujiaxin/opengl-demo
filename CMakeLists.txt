@@ -13,6 +13,9 @@ add_subdirectory(third_party/glfw)
 add_subdirectory(third_party/glad)
 include_directories(third_party/glad/include)
 
+# stb
+include_directories(third_party/stb)
+
 include_directories(include)
 
 add_executable(learn_opengl src/main.cpp src/program.cpp src/shader.cpp src/texture.cpp)
