@@ -48,9 +48,13 @@ int main() {
     return -1;
   }
 
-  const auto program =
-      Program(VertexShader("../shader/shader.vs"), FragmentShader("../shader/shader.fs"));
-  const auto texture = Texture("../resource/texture/container.jpg");
+  const auto program = Program(VertexShader("../shader/vertex_shader/texture.vert"),
+                               FragmentShader("../shader/fragment_shader/texture_mix.frag"));
+  program.Use();
+  program.SetUniform("texture1", 0);
+  program.SetUniform("texture2", 1);
+  const auto texture1 = Texture("../resource/texture/container.jpg");
+  const auto texture2 = Texture("../resource/texture/awesomeface.png");
 
   // 顶点数据
   const float vertices[] = {
@@ -116,7 +120,10 @@ int main() {
     //    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
     //    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
 
-    texture.Bind();
+    glActiveTexture(GL_TEXTURE0);
+    texture1.Bind();
+    glActiveTexture(GL_TEXTURE1);
+    texture2.Bind();
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);
