@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#include "glad/glad.h"
+
 Program::Program() : id_(glCreateProgram()) {}
 
 Program::Program(const Shader &vertex_shader, const Shader &fragment_shader) : Program() {

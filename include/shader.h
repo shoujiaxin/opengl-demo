@@ -6,8 +6,6 @@
 
 #include <string>
 
-#include "glad/glad.h"
-
 class Shader {
  public:
   ~Shader();

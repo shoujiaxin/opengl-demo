@@ -8,6 +8,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "glad/glad.h"
+
 Shader::~Shader() { Delete(); }
 
 unsigned int Shader::Id() const { return id_; }

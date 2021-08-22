@@ -7,9 +7,7 @@
 
 #include "program.h"
 #include "shader.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include "texture.h"
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
@@ -50,15 +48,17 @@ int main() {
     return -1;
   }
 
-  auto program =
+  const auto program =
       Program(VertexShader("../shader/shader.vs"), FragmentShader("../shader/shader.fs"));
+  const auto texture = Texture("../resource/texture/container.jpg");
 
   // 顶点数据
   const float vertices[] = {
-      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f,  // 右上角
-      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,  // 右下角
-      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f,  // 左下角
-      -0.5f, 0.5f,  0.0f, 0.5f, 0.5f, 0.5f   // 左上角
+      // ----- 位置 -----, ----- 颜色 -----, --- 纹理坐标 ---
+      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // 右上角
+      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 右下角
+      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // 左下角
+      -0.5f, 0.5f,  0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f   // 左上角
   };
   const unsigned int indices[] = {
       0, 1, 3,  // 第一个三角形
@@ -80,12 +80,16 @@ int main() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
+  constexpr auto stride = 8 * sizeof(float);
   // 位置属性
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
   glEnableVertexAttribArray(0);
   // 颜色属性
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
+  // 纹理属性
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+  glEnableVertexAttribArray(2);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);  // 解绑顶点缓冲对象
   glBindVertexArray(0);              // 解绑顶点数组对象
@@ -112,10 +116,12 @@ int main() {
     //    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
     //    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
 
+    texture.Bind();
+
     // 绘制图形
     glBindVertexArray(vertex_array_object);
-    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
-    //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);// 矩形
+    //    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // 矩形
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
     glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）
