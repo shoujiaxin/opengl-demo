@@ -10,8 +10,16 @@ class Texture {
  public:
   explicit Texture(const std::string& path);
 
+  ~Texture();
+
   // 绑定纹理
   void Bind() const;
+
+  // 设置过滤方式
+  void SetFiltering(int operation, int method) const;
+
+  // 设置环绕方式
+  void SetWrap(int axis, int mode) const;
 
  private:
   int height_;

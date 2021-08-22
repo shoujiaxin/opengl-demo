@@ -23,7 +23,7 @@ Texture::Texture(const std::string &path) {
   // 创建纹理
   glGenTextures(1, &id_);
   // 绑定纹理
-  glBindTexture(GL_TEXTURE_2D, id_);
+  Bind();
   // 生成纹理
   const auto format = (path.substr(path.size() - 4, 4) == ".png") ? GL_RGBA : GL_RGB;
   glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, format, GL_UNSIGNED_BYTE, data);
@@ -33,4 +33,12 @@ Texture::Texture(const std::string &path) {
   stbi_image_free(data);
 }
 
+Texture::~Texture() { glDeleteTextures(1, &id_); }
+
 void Texture::Bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
+
+void Texture::SetFiltering(int operation, int method) const {
+  glTexParameteri(GL_TEXTURE_2D, operation, method);
+}
+
+void Texture::SetWrap(int axis, int mode) const { glTexParameteri(GL_TEXTURE_2D, axis, mode); }
