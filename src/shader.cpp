@@ -10,8 +10,6 @@
 
 Shader::~Shader() { Delete(); }
 
-void Shader::Delete() const { glDeleteShader(id_); }
-
 unsigned int Shader::Id() const { return id_; }
 
 void Shader::Compile(const std::string &source) const {
@@ -32,8 +30,10 @@ std::string Shader::LoadSourceFrom(const std::string &path) {
   auto file = std::ifstream(path);
   std::stringstream stream;
   stream << file.rdbuf();
-  return std::move(stream.str());
+  return stream.str();
 }
+
+void Shader::Delete() const { glDeleteShader(id_); }
 
 VertexShader::VertexShader(const std::string &path) {
   id_ = glCreateShader(GL_VERTEX_SHADER);

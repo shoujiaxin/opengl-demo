@@ -14,13 +14,17 @@ class Program {
 
   ~Program();
 
+  // 使用着色器程序
   void Use() const;
 
  private:
+  // 添加着色器
   void AttachShader(const Shader& shader) const;
 
+  // 删除着色器程序
   void Delete() const;
 
+  // 连接着色器
   void Link() const;
 
   void SetUniform(const std::string& name, bool value) const;

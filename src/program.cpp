@@ -18,10 +18,7 @@ Program::~Program() { Delete(); }
 
 void Program::Use() const { glUseProgram(id_); }
 
-void Program::AttachShader(const Shader &shader) const {
-  glAttachShader(id_, shader.Id());
-  shader.Delete();
-}
+void Program::AttachShader(const Shader &shader) const { glAttachShader(id_, shader.Id()); }
 
 void Program::Delete() const { glDeleteProgram(id_); }
 
