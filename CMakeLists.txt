@@ -9,8 +9,12 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(third_party/glfw)
 
+# GLAD
+add_subdirectory(third_party/glad)
+include_directories(third_party/glad/include)
+
 include_directories(include)
 
-add_executable(learn_opengl src/main.cpp src/glad.c src/program.cpp src/shader.cpp)
+add_executable(learn_opengl src/main.cpp src/program.cpp src/shader.cpp)
 
-target_link_libraries(learn_opengl glfw)
+target_link_libraries(learn_opengl glfw glad)
