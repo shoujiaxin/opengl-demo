@@ -51,8 +51,7 @@ int main() {
   }
 
   auto program =
-      Program(VertexShader("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.vs"),
-              FragmentShader("/Users/martinshou/Developer/GitHub/learn-opengl/shader/shader.fs"));
+      Program(VertexShader("../shader/shader.vs"), FragmentShader("../shader/shader.fs"));
 
   // 顶点数据
   const float vertices[] = {
