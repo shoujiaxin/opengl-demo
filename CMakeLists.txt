@@ -13,6 +13,9 @@ add_subdirectory(third_party/glfw)
 add_subdirectory(third_party/glad)
 include_directories(third_party/glad/include)
 
+# GLM
+include_directories(third_party/glm)
+
 # stb
 include_directories(third_party/stb)
 
