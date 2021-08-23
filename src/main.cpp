@@ -5,6 +5,9 @@
 #include <cmath>
 #include <iostream>
 
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
+#include "glm/gtc/type_ptr.hpp"
 #include "program.h"
 #include "shader.h"
 #include "texture.h"
@@ -115,8 +118,17 @@ int main() {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // 变换
+    auto transform = glm::mat4(1.0f);
+    transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
+    transform =
+        glm::rotate(transform, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
+    //    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    //    transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
+
     // 激活着色器程序
     program.Use();
+    program.SetUniformMatrix4fv("transform", glm::value_ptr(transform));
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;

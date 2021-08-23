@@ -16,9 +16,11 @@ class Program {
 
   void SetUniform(const std::string& name, bool value) const;
 
+  void SetUniform(const std::string& name, float value) const;
+
   void SetUniform(const std::string& name, int value) const;
 
-  void SetUniform(const std::string& name, float value) const;
+  void SetUniformMatrix4fv(const std::string& name, float* value) const;
 
   // 使用着色器程序
   void Use() const;

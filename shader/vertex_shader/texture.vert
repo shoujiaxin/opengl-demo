@@ -7,8 +7,10 @@ layout(location = 2) in vec2 aTexCoord;// 纹理变量的属性位置值为 2
 out vec3 ourColor;// 向片段着色器输出一个颜色
 out vec2 TexCoord;// 向片段着色器输出一个纹理坐标
 
+uniform mat4 transform;
+
 void main() {
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = transform * vec4(aPos, 1.0);
     ourColor = aColor;// 从顶点数据获取颜色
     TexCoord = aTexCoord;
 }
