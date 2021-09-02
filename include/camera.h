@@ -18,7 +18,7 @@ class Camera {
   auto ViewMatrix() const -> decltype(glm::value_ptr(glm::mat4()));
 
  private:
-  // 摄像机位置
+  // 相机位置
   glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
   // 目标位置

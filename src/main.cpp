@@ -18,6 +18,15 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
+#define CAMERA_FRONT glm::vec3(0.0f, 0.0f, -1.0f)
+#define CAMERA_UP glm::vec3(0.0f, 1.0f, 0.0f)
+#define CAMERA_RIGHT glm::vec3(1.0f, 0.0f, 0.0f)
+
+auto last_frame_time = 0.0f;  // 上一帧的时间
+auto delta_time = 0.0f;       // 当前帧与上一帧的时间差
+
+auto camera_position = glm::vec3(0.0f, 0.0f, 3.0f);
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -25,6 +34,21 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
 void HandleInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
+    return;
+  }
+
+  const auto camera_move_speed = 2.5f * delta_time;
+  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+    camera_position += camera_move_speed * CAMERA_FRONT;
+  }
+  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+    camera_position -= camera_move_speed * CAMERA_FRONT;
+  }
+  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+    camera_position -= camera_move_speed * CAMERA_RIGHT;
+  }
+  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+    camera_position += camera_move_speed * CAMERA_RIGHT;
   }
 }
 
@@ -144,10 +168,16 @@ int main() {
   // 开启深度测试
   glEnable(GL_DEPTH_TEST);
 
-  auto camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+  // 相机
+  auto camera = Camera(camera_position);
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
+    // 计算两帧之间的时间差
+    const auto current_time = glfwGetTime();
+    delta_time = current_time - last_frame_time;
+    last_frame_time = current_time;
+
     // 输入
     HandleInput(window);
 
@@ -170,10 +200,11 @@ int main() {
         glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
 
     // 移动相机
-    const auto radius = 10.0f;
-    const auto camera_x = sin(glfwGetTime()) * radius;
-    const auto camera_z = cos(glfwGetTime()) * radius;
-    camera.SetPosition(glm::vec3(camera_x, 0.0f, camera_z));
+    //    const auto radius = 10.0f;
+    //    const auto camera_x = sin(glfwGetTime()) * radius;
+    //    const auto camera_z = cos(glfwGetTime()) * radius;
+    camera.SetPosition(camera_position);
+    camera.LookAt(camera_position + CAMERA_FRONT);
 
     // 激活着色器程序
     program.Use();
