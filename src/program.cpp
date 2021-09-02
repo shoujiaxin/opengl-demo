@@ -48,6 +48,6 @@ void Program::SetUniform(const std::string &name, int value) const {
   glUniform1i(glGetUniformLocation(id_, name.c_str()), value);
 }
 
-void Program::SetUniformMatrix4fv(const std::string &name, float *value) const {
+void Program::SetUniformMatrix4fv(const std::string &name, const float *value) const {
   glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, value);
 }

@@ -7,6 +7,7 @@
 #include <random>
 #include <vector>
 
+#include "camera.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -143,6 +144,8 @@ int main() {
   // 开启深度测试
   glEnable(GL_DEPTH_TEST);
 
+  auto camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
     // 输入
@@ -166,9 +169,15 @@ int main() {
     auto projection_matrix = glm::perspective(
         glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
 
+    // 移动相机
+    const auto radius = 10.0f;
+    const auto camera_x = sin(glfwGetTime()) * radius;
+    const auto camera_z = cos(glfwGetTime()) * radius;
+    camera.SetPosition(glm::vec3(camera_x, 0.0f, camera_z));
+
     // 激活着色器程序
     program.Use();
-    program.SetUniformMatrix4fv("view", glm::value_ptr(view_matrix));
+    program.SetUniformMatrix4fv("view", camera.ViewMatrix());
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniformMatrix4fv("projection", glm::value_ptr(projection_matrix));
 

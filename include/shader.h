@@ -14,7 +14,7 @@ class Shader {
   unsigned int Id() const;
 
  protected:
-  unsigned int id_;
+  unsigned int id_ = 0;
 
   // 编译着色器
   void Compile(const std::string& source) const;

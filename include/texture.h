@@ -22,9 +22,9 @@ class Texture {
   void SetWrap(int axis, int mode) const;
 
  private:
-  int height_;
+  int height_ = 0;
 
-  unsigned int id_;
+  unsigned int id_ = 0;
 
-  int width_;
+  int width_ = 0;
 };

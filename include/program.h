@@ -20,13 +20,13 @@ class Program {
 
   void SetUniform(const std::string& name, int value) const;
 
-  void SetUniformMatrix4fv(const std::string& name, float* value) const;
+  void SetUniformMatrix4fv(const std::string& name, const float* value) const;
 
   // 使用着色器程序
   void Use() const;
 
  private:
-  unsigned int id_;
+  unsigned int id_ = 0;
 
   // 添加着色器
   void AttachShader(const Shader& shader) const;
