@@ -4,6 +4,8 @@
 // clang-format on
 #include <cmath>
 #include <iostream>
+#include <random>
+#include <vector>
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
@@ -97,6 +99,12 @@ int main() {
       0, 1, 3,  // 第一个三角形
       1, 2, 3   // 第二个三角形
   };
+  const auto cube_positions =
+      std::vector<glm::vec3>{glm::vec3(0.0f, 0.0f, 0.0f),    glm::vec3(2.0f, 5.0f, -15.0f),
+                             glm::vec3(-1.5f, -2.2f, -2.5f), glm::vec3(-3.8f, -2.0f, -12.3f),
+                             glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
+                             glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
+                             glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
 
   unsigned int vertex_array_object;    // 顶点数组对象
   unsigned int vertex_buffer_object;   // 顶点缓冲对象
@@ -145,10 +153,10 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // 模型矩阵
-    auto model_matrix = glm::mat4(1.0f);
-    model_matrix =
-        glm::rotate(model_matrix, static_cast<float>(glfwGetTime()) * glm::radians(-55.0f),
-                    glm::vec3(0.5f, 1.0f, 0.0f));
+    //    auto model_matrix = glm::mat4(1.0f);
+    //    model_matrix =
+    //        glm::rotate(model_matrix, static_cast<float>(glfwGetTime()) * glm::radians(-55.0f),
+    //                    glm::vec3(0.5f, 1.0f, 0.0f));
 
     // 观察矩阵
     auto view_matrix = glm::mat4(1.0f);
@@ -161,7 +169,7 @@ int main() {
     // 激活着色器程序
     program.Use();
     program.SetUniformMatrix4fv("view", glm::value_ptr(view_matrix));
-    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
+    //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniformMatrix4fv("projection", glm::value_ptr(projection_matrix));
 
     //    const auto time_value = glfwGetTime();
@@ -173,7 +181,17 @@ int main() {
     glBindVertexArray(vertex_array_object);
     //    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
     //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // 矩形
-    glDrawArrays(GL_TRIANGLES, 0, 36);  // 立方体
+    //    glDrawArrays(GL_TRIANGLES, 0, 36);  // 立方体
+    std::default_random_engine e;
+    std::uniform_int_distribution<unsigned> u(0, cube_positions.size());
+    for (const auto& position : cube_positions) {
+      auto model_matrix = glm::mat4(1.0f);
+      model_matrix = glm::translate(model_matrix, position);
+      model_matrix =
+          glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
+      program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
     glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）
