@@ -118,17 +118,23 @@ int main() {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // 变换
-    auto transform = glm::mat4(1.0f);
-    transform = glm::translate(transform, glm::vec3(0.5f, -0.5f, 0.0f));
-    transform =
-        glm::rotate(transform, static_cast<float>(glfwGetTime()), glm::vec3(0.0f, 0.0f, 1.0f));
-    //    transform = glm::rotate(transform, glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    //    transform = glm::scale(transform, glm::vec3(0.5, 0.5, 0.5));
+    // 模型矩阵
+    auto model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::rotate(model_matrix, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // 观察矩阵
+    auto view_matrix = glm::mat4(1.0f);
+    view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    // 投影矩阵
+    auto projection_matrix = glm::perspective(
+        glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
 
     // 激活着色器程序
     program.Use();
-    program.SetUniformMatrix4fv("transform", glm::value_ptr(transform));
+    program.SetUniformMatrix4fv("view", glm::value_ptr(view_matrix));
+    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
+    program.SetUniformMatrix4fv("projection", glm::value_ptr(projection_matrix));
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
