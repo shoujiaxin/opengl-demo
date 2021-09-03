@@ -25,13 +25,19 @@
 auto last_frame_time = 0.0f;  // 上一帧的时间
 auto delta_time = 0.0f;       // 当前帧与上一帧的时间差
 
+auto first_cursor = true;
+auto last_cursor_position = glm::vec2(0.5f, 0.5f);
+
 auto camera_position = glm::vec3(0.0f, 0.0f, 3.0f);
+auto camera_front = CAMERA_FRONT;
+auto camera_pitch = 0.0f;
+auto camera_yaw = -90.0f;
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
-void HandleInput(GLFWwindow* window) {
+void HandleKeyboardInput(GLFWwindow* window) {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
     glfwSetWindowShouldClose(window, true);
     return;
@@ -39,17 +45,43 @@ void HandleInput(GLFWwindow* window) {
 
   const auto camera_move_speed = 2.5f * delta_time;
   if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera_position += camera_move_speed * CAMERA_FRONT;
+    camera_position += camera_move_speed * camera_front;
   }
   if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera_position -= camera_move_speed * CAMERA_FRONT;
+    camera_position -= camera_move_speed * camera_front;
   }
   if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera_position -= camera_move_speed * CAMERA_RIGHT;
+    camera_position -= camera_move_speed * glm::normalize(glm::cross(camera_front, CAMERA_UP));
   }
   if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera_position += camera_move_speed * CAMERA_RIGHT;
+    camera_position += camera_move_speed * glm::normalize(glm::cross(camera_front, CAMERA_UP));
   }
+}
+
+void HandleCursorMove(GLFWwindow* window, double x, double y) {
+  const auto normalized_x = x / SCR_WIDTH;
+  const auto normalized_y = y / SCR_HEIGHT;
+  if (first_cursor) {
+    first_cursor = false;
+    last_cursor_position.x = normalized_x;
+    last_cursor_position.y = normalized_y;
+  }
+
+  constexpr auto sensitivity = 100.0f;
+  const auto offset_x = sensitivity * (normalized_x - last_cursor_position.x);
+  const auto offset_y = sensitivity * (last_cursor_position.y - normalized_y);
+
+  camera_yaw += offset_x;
+  camera_pitch += offset_y;
+
+  auto target = glm::vec3(0.0f, 0.0f, 0.0f);
+  target.x = cos(glm::radians(camera_yaw)) * cos(glm::radians(camera_pitch));
+  target.y = sin(glm::radians(camera_pitch));
+  target.z = sin(glm::radians(camera_yaw)) * cos(glm::radians(camera_pitch));
+  camera_front = glm::normalize(target);
+
+  last_cursor_position.x = normalized_x;
+  last_cursor_position.y = normalized_y;
 }
 
 int main() {
@@ -71,6 +103,9 @@ int main() {
   }
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+  // 捕捉并隐藏光标
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+  glfwSetCursorPosCallback(window, HandleCursorMove);
 
   // 初始化 GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -179,7 +214,7 @@ int main() {
     last_frame_time = current_time;
 
     // 输入
-    HandleInput(window);
+    HandleKeyboardInput(window);
 
     // 清除颜色缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -204,7 +239,7 @@ int main() {
     //    const auto camera_x = sin(glfwGetTime()) * radius;
     //    const auto camera_z = cos(glfwGetTime()) * radius;
     camera.SetPosition(camera_position);
-    camera.LookAt(camera_position + CAMERA_FRONT);
+    camera.LookAt(camera_position + camera_front);
 
     // 激活着色器程序
     program.Use();
