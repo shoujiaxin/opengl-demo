@@ -8,8 +8,7 @@
 
 PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far)
     : fov_(fov), aspect_(aspect), near_(near), far_(far) {
-  UpdateProjectionMatrix();
-  UpdateViewMatrix();
+  UpdateMatrices();
 }
 
 float PerspectiveCamera::Fov() const { return fov_; }
@@ -47,6 +46,11 @@ void PerspectiveCamera::SetNear(float near) {
 
 void PerspectiveCamera::SetPosition(const glm::vec3& position) {
   position_ = position;
+  UpdateViewMatrix();
+}
+
+void PerspectiveCamera::UpdateMatrices() {
+  UpdateProjectionMatrix();
   UpdateViewMatrix();
 }
 

@@ -29,6 +29,8 @@ class PerspectiveCamera {
 
   void SetPosition(const glm::vec3& position);
 
+  void UpdateMatrices();
+
   auto ViewMatrix() const -> decltype(glm::value_ptr(glm::mat4()));
 
  private:
