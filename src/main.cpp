@@ -33,6 +33,8 @@ auto camera_front = CAMERA_FRONT;
 auto camera_pitch = 0.0f;
 auto camera_yaw = -90.0f;
 
+auto fov = 45.0f;
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -84,6 +86,12 @@ void HandleCursorMove(GLFWwindow* window, double x, double y) {
   last_cursor_position.y = normalized_y;
 }
 
+void HandleScroll(GLFWwindow* window, double x, double y) {
+  fov -= y;
+  fov = std::min(fov, 45.0f);
+  fov = std::max(fov, 1.0f);
+}
+
 int main() {
   // 初始化 GLFW
   glfwInit();
@@ -106,6 +114,7 @@ int main() {
   // 捕捉并隐藏光标
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
   glfwSetCursorPosCallback(window, HandleCursorMove);
+  glfwSetScrollCallback(window, HandleScroll);
 
   // 初始化 GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -232,7 +241,7 @@ int main() {
 
     // 投影矩阵
     auto projection_matrix = glm::perspective(
-        glm::radians(45.0f), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
+        glm::radians(fov), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
 
     // 移动相机
     //    const auto radius = 10.0f;
