@@ -39,12 +39,10 @@ void Shader::Delete() const { glDeleteShader(id_); }
 
 VertexShader::VertexShader(const std::string &path) {
   id_ = glCreateShader(GL_VERTEX_SHADER);
-  const auto source = LoadSourceFrom(path);
-  Compile(source);
+  Compile(LoadSourceFrom(path));
 }
 
 FragmentShader::FragmentShader(const std::string &path) {
   id_ = glCreateShader(GL_FRAGMENT_SHADER);
-  const auto source = LoadSourceFrom(path);
-  Compile(source);
+  Compile(LoadSourceFrom(path));
 }

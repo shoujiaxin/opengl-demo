@@ -6,6 +6,10 @@
 
 #include "glm/gtc/matrix_transform.hpp"
 
+const glm::vec3& Camera::Position() const { return position_; }
+
+void Camera::SetPosition(const glm::vec3& position) { position_ = position; }
+
 PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far)
     : fov_(fov), aspect_(aspect), near_(near), far_(far) {
   UpdateMatrices();
@@ -17,8 +21,6 @@ void PerspectiveCamera::LookAt(const glm::vec3& target) {
   target_ = target;
   UpdateViewMatrix();
 }
-
-const glm::vec3& PerspectiveCamera::Position() const { return position_; }
 
 auto PerspectiveCamera::ProjectionMatrix() const -> decltype(glm::value_ptr(glm::mat4())) {
   return glm::value_ptr(projection_matrix_);
