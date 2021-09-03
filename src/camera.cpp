@@ -12,10 +12,14 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float 
   UpdateViewMatrix();
 }
 
+float PerspectiveCamera::Fov() const { return fov_; }
+
 void PerspectiveCamera::LookAt(const glm::vec3& target) {
   target_ = target;
   UpdateViewMatrix();
 }
+
+const glm::vec3& PerspectiveCamera::Position() const { return position_; }
 
 auto PerspectiveCamera::ProjectionMatrix() const -> decltype(glm::value_ptr(glm::mat4())) {
   return glm::value_ptr(projection_matrix_);

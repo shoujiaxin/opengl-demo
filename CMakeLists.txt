@@ -21,6 +21,8 @@ include_directories(third_party/stb)
 
 include_directories(include)
 
-add_executable(learn_opengl src/main.cpp src/program.cpp src/shader.cpp src/texture.cpp src/camera.cpp)
+file(GLOB SOURCE_FILES src/*.cpp)
+
+add_executable(learn_opengl ${SOURCE_FILES})
 
 target_link_libraries(learn_opengl glfw glad)

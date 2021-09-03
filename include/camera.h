@@ -11,7 +11,11 @@ class PerspectiveCamera {
  public:
   PerspectiveCamera(float fov = 50.0f, float aspect = 1.0f, float near = 0.1f, float far = 2000.0f);
 
+  float Fov() const;
+
   void LookAt(const glm::vec3& target);
+
+  const glm::vec3& Position() const;
 
   auto ProjectionMatrix() const -> decltype(glm::value_ptr(glm::mat4()));
 

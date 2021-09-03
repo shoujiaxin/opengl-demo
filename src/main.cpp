@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "camera.h"
+#include "controls.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -18,23 +19,6 @@
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
 
-#define CAMERA_FRONT glm::vec3(0.0f, 0.0f, -1.0f)
-#define CAMERA_UP glm::vec3(0.0f, 1.0f, 0.0f)
-#define CAMERA_RIGHT glm::vec3(1.0f, 0.0f, 0.0f)
-
-auto last_frame_time = 0.0f;  // 上一帧的时间
-auto delta_time = 0.0f;       // 当前帧与上一帧的时间差
-
-auto first_cursor = true;
-auto last_cursor_position = glm::vec2(0.5f, 0.5f);
-
-auto camera_position = glm::vec3(0.0f, 0.0f, 3.0f);
-auto camera_front = CAMERA_FRONT;
-auto camera_pitch = 0.0f;
-auto camera_yaw = -90.0f;
-
-auto fov = 45.0f;
-
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
@@ -44,52 +28,6 @@ void HandleKeyboardInput(GLFWwindow* window) {
     glfwSetWindowShouldClose(window, true);
     return;
   }
-
-  const auto camera_move_speed = 2.5f * delta_time;
-  if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-    camera_position += camera_move_speed * camera_front;
-  }
-  if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-    camera_position -= camera_move_speed * camera_front;
-  }
-  if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-    camera_position -= camera_move_speed * glm::normalize(glm::cross(camera_front, CAMERA_UP));
-  }
-  if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-    camera_position += camera_move_speed * glm::normalize(glm::cross(camera_front, CAMERA_UP));
-  }
-}
-
-void HandleCursorMove(GLFWwindow* window, double x, double y) {
-  const auto normalized_x = x / SCR_WIDTH;
-  const auto normalized_y = y / SCR_HEIGHT;
-  if (first_cursor) {
-    first_cursor = false;
-    last_cursor_position.x = normalized_x;
-    last_cursor_position.y = normalized_y;
-  }
-
-  constexpr auto sensitivity = 100.0f;
-  const auto offset_x = sensitivity * (normalized_x - last_cursor_position.x);
-  const auto offset_y = sensitivity * (last_cursor_position.y - normalized_y);
-
-  camera_yaw += offset_x;
-  camera_pitch += offset_y;
-
-  auto target = glm::vec3(0.0f, 0.0f, 0.0f);
-  target.x = cos(glm::radians(camera_yaw)) * cos(glm::radians(camera_pitch));
-  target.y = sin(glm::radians(camera_pitch));
-  target.z = sin(glm::radians(camera_yaw)) * cos(glm::radians(camera_pitch));
-  camera_front = glm::normalize(target);
-
-  last_cursor_position.x = normalized_x;
-  last_cursor_position.y = normalized_y;
-}
-
-void HandleScroll(GLFWwindow* window, double x, double y) {
-  fov -= y;
-  fov = std::min(fov, 45.0f);
-  fov = std::max(fov, 1.0f);
 }
 
 int main() {
@@ -113,8 +51,6 @@ int main() {
   glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
   // 捕捉并隐藏光标
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-  glfwSetCursorPosCallback(window, HandleCursorMove);
-  glfwSetScrollCallback(window, HandleScroll);
 
   // 初始化 GLAD
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -214,14 +150,11 @@ int main() {
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
+  camera.SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+  auto controls = Controls(camera, window);
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
-    // 计算两帧之间的时间差
-    const auto current_time = glfwGetTime();
-    delta_time = current_time - last_frame_time;
-    last_frame_time = current_time;
-
     // 输入
     HandleKeyboardInput(window);
 
@@ -236,8 +169,7 @@ int main() {
     //                    glm::vec3(0.5f, 1.0f, 0.0f));
 
     // 移动相机
-    camera.SetPosition(camera_position);
-    camera.LookAt(camera_position + camera_front);
+    controls.Update();
 
     // 激活着色器程序
     program.Use();
