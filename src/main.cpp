@@ -213,7 +213,7 @@ int main() {
   glEnable(GL_DEPTH_TEST);
 
   // 相机
-  auto camera = Camera(camera_position);
+  auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
@@ -235,26 +235,15 @@ int main() {
     //        glm::rotate(model_matrix, static_cast<float>(glfwGetTime()) * glm::radians(-55.0f),
     //                    glm::vec3(0.5f, 1.0f, 0.0f));
 
-    // 观察矩阵
-    auto view_matrix = glm::mat4(1.0f);
-    view_matrix = glm::translate(view_matrix, glm::vec3(0.0f, 0.0f, -3.0f));
-
-    // 投影矩阵
-    auto projection_matrix = glm::perspective(
-        glm::radians(fov), static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
-
     // 移动相机
-    //    const auto radius = 10.0f;
-    //    const auto camera_x = sin(glfwGetTime()) * radius;
-    //    const auto camera_z = cos(glfwGetTime()) * radius;
     camera.SetPosition(camera_position);
     camera.LookAt(camera_position + camera_front);
 
     // 激活着色器程序
     program.Use();
-    program.SetUniformMatrix4fv("view", camera.ViewMatrix());
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
-    program.SetUniformMatrix4fv("projection", glm::value_ptr(projection_matrix));
+    program.SetUniformMatrix4fv("view", camera.ViewMatrix());
+    program.SetUniformMatrix4fv("projection", camera.ProjectionMatrix());
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
