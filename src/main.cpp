@@ -136,14 +136,18 @@ int main() {
   glBindVertexArray(0);              // 解绑顶点数组对象
 
   // 着色器程序
-  const auto program =
-      Program(VertexShader("../shader/vertex_shader/view_space_lighting.vert"),
-              FragmentShader("../shader/fragment_shader/view_space_lighting.frag"));
+  const auto program = Program(VertexShader("../shader/vertex_shader/view_space_lighting.vert"),
+                               FragmentShader("../shader/fragment_shader/material.frag"));
   program.Use();
   //  program.SetUniform("texture1", 0);
   //  program.SetUniform("texture2", 1);
-  program.SetUniform("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-  program.SetUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+  program.SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+  program.SetUniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+  program.SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+  program.SetUniform("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+  program.SetUniform("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+  program.SetUniform("material.specular", glm::vec3(0.50f, 0.5f, 0.5f));
+  program.SetUniform("material.shininess", 32.0f);
 
   // 加载纹理
   //  glActiveTexture(GL_TEXTURE0);
@@ -192,8 +196,12 @@ int main() {
     //                    glm::vec3(0.5f, 1.0f, 0.0f));
 
     const auto current_time = glfwGetTime();
-    light_position.x = 2.0 * cos(2 * current_time);
-    light_position.z = 2.0 * sin(2 * current_time);
+    //    light_position.x = 2.0 * cos(2 * current_time);
+    //    light_position.z = 2.0 * sin(2 * current_time);
+    const auto light_color =
+        glm::vec3(sin(current_time * 2.0f), sin(current_time * 0.7f), sin(current_time * 1.3f));
+    const auto diffuse_color = light_color * glm::vec3(0.5f);
+    const auto ambient_color = diffuse_color * glm::vec3(0.2f);
 
     // 移动相机
     controls.Update();
@@ -217,6 +225,8 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
     program.SetUniform("lightPos", light_position);
+    program.SetUniform("light.ambient", ambient_color);
+    program.SetUniform("light.diffuse", diffuse_color);
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
