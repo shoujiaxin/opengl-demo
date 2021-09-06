@@ -52,6 +52,12 @@ void Controls::OnKeyboardPress(float dt) {
   if (glfwGetKey(window_, GLFW_KEY_D) == GLFW_PRESS) {
     camera_position += camera_move_speed * glm::normalize(glm::cross(camera_front_, CAMERA_UP));
   }
+  if (glfwGetKey(window_, GLFW_KEY_SPACE) == GLFW_PRESS) {
+    camera_position += camera_move_speed * CAMERA_UP;
+  }
+  if (glfwGetKey(window_, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+    camera_position -= camera_move_speed * CAMERA_UP;
+  }
   camera_.SetPosition(camera_position);
 }
 
