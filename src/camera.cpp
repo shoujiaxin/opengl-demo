@@ -8,7 +8,7 @@
 
 const glm::vec3& Camera::Position() const { return position_; }
 
-void Camera::SetPosition(const glm::vec3& position) { position_ = position; }
+void Camera::SetPosition(const glm::vec3& value) { position_ = value; }
 
 PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far)
     : fov_(fov), aspect_(aspect), near_(near), far_(far) {
@@ -24,28 +24,28 @@ void PerspectiveCamera::LookAt(const glm::vec3& target) {
 
 const glm::mat4& PerspectiveCamera::ProjectionMatrix() const { return projection_matrix_; }
 
-void PerspectiveCamera::SetAspect(float aspect) {
-  aspect_ = aspect;
+void PerspectiveCamera::SetAspect(float value) {
+  aspect_ = value;
   UpdateProjectionMatrix();
 }
 
-void PerspectiveCamera::SetFar(float far) {
-  far_ = far;
+void PerspectiveCamera::SetFar(float value) {
+  far_ = value;
   UpdateProjectionMatrix();
 }
 
-void PerspectiveCamera::SetFov(float fov) {
-  fov_ = fov;
+void PerspectiveCamera::SetFov(float value) {
+  fov_ = value;
   UpdateProjectionMatrix();
 }
 
-void PerspectiveCamera::SetNear(float near) {
-  near_ = near;
+void PerspectiveCamera::SetNear(float value) {
+  near_ = value;
   UpdateProjectionMatrix();
 }
 
-void PerspectiveCamera::SetPosition(const glm::vec3& position) {
-  position_ = position;
+void PerspectiveCamera::SetPosition(const glm::vec3& value) {
+  position_ = value;
   UpdateViewMatrix();
 }
 

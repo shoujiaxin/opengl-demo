@@ -10,7 +10,7 @@ class Camera {
  public:
   virtual const glm::vec3& Position() const;
 
-  virtual void SetPosition(const glm::vec3& position);
+  virtual void SetPosition(const glm::vec3& value);
 
   virtual void UpdateMatrices() = 0;
 
@@ -29,15 +29,15 @@ class PerspectiveCamera : public Camera {
 
   const glm::mat4& ProjectionMatrix() const;
 
-  void SetAspect(float aspect);
+  void SetAspect(float value);
 
-  void SetFar(float far);
+  void SetFar(float value);
 
-  void SetFov(float fov);
+  void SetFov(float value);
 
-  void SetNear(float near);
+  void SetNear(float value);
 
-  void SetPosition(const glm::vec3& position) override;
+  void SetPosition(const glm::vec3& value) override;
 
   void UpdateMatrices() override;
 

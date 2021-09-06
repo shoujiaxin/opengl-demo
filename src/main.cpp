@@ -10,14 +10,13 @@
 #include "camera.h"
 #include "controls.h"
 #include "glm/gtc/matrix_transform.hpp"
+#include "light.h"
 #include "program.h"
 #include "shader.h"
 #include "texture.h"
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
-
-auto light_position = glm::vec3(1.2f, 1.0f, 2.0f);
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -141,9 +140,6 @@ int main() {
   program.Use();
   //  program.SetUniform("texture1", 0);
   //  program.SetUniform("texture2", 1);
-  program.SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-  program.SetUniform("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
-  program.SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
   program.SetUniform("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
   program.SetUniform("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
   program.SetUniform("material.specular", glm::vec3(0.50f, 0.5f, 0.5f));
@@ -166,6 +162,11 @@ int main() {
   glBindVertexArray(0);
   const auto light_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
                                      FragmentShader("../shader/fragment_shader/light.frag"));
+  auto ambient_light = AmbientLight(Color::kWhite, 0.2);
+  auto diffuse_light = DiffuseLight(Color::kWhite, 0.5);
+  diffuse_light.SetPosition(glm::vec3(1.2f, 1.0f, 2.0f));
+  auto specular_light = SpecularLight(Color::kWhite, 1.0);
+  specular_light.SetPosition(diffuse_light.Position());
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -196,19 +197,19 @@ int main() {
     //                    glm::vec3(0.5f, 1.0f, 0.0f));
 
     const auto current_time = glfwGetTime();
-    //    light_position.x = 2.0 * cos(2 * current_time);
-    //    light_position.z = 2.0 * sin(2 * current_time);
     const auto light_color =
         glm::vec3(sin(current_time * 2.0f), sin(current_time * 0.7f), sin(current_time * 1.3f));
-    const auto diffuse_color = light_color * glm::vec3(0.5f);
-    const auto ambient_color = diffuse_color * glm::vec3(0.2f);
+    diffuse_light.SetColor(light_color);
+    diffuse_light.SetIntensity(0.5f);
+    ambient_light.SetColor(light_color);
+    ambient_light.SetIntensity(0.2f);
 
     // 移动相机
     controls.Update();
 
     // 灯光位置
     auto model = glm::mat4(1.0f);
-    model = glm::translate(model, light_position);
+    model = glm::translate(model, diffuse_light.Position());
     model = glm::scale(model, glm::vec3(0.2f));
     light_program.Use();
     light_program.SetUniform("model", model);
@@ -224,9 +225,10 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("lightPos", light_position);
-    program.SetUniform("light.ambient", ambient_color);
-    program.SetUniform("light.diffuse", diffuse_color);
+    program.SetUniform("lightPos", diffuse_light.Position());
+    program.SetUniform("light.ambient", ambient_light.Color());
+    program.SetUniform("light.diffuse", diffuse_light.Color());
+    program.SetUniform("light.specular", specular_light.Color());
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
