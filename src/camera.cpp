@@ -22,9 +22,7 @@ void PerspectiveCamera::LookAt(const glm::vec3& target) {
   UpdateViewMatrix();
 }
 
-auto PerspectiveCamera::ProjectionMatrix() const -> decltype(glm::value_ptr(glm::mat4())) {
-  return glm::value_ptr(projection_matrix_);
-}
+const glm::mat4& PerspectiveCamera::ProjectionMatrix() const { return projection_matrix_; }
 
 void PerspectiveCamera::SetAspect(float aspect) {
   aspect_ = aspect;
@@ -56,9 +54,7 @@ void PerspectiveCamera::UpdateMatrices() {
   UpdateViewMatrix();
 }
 
-auto PerspectiveCamera::ViewMatrix() const -> decltype(glm::value_ptr(glm::mat4())) {
-  return glm::value_ptr(view_matrix_);
-}
+const glm::mat4& PerspectiveCamera::ViewMatrix() const { return view_matrix_; }
 
 void PerspectiveCamera::UpdateProjectionMatrix() {
   projection_matrix_ = glm::perspective(glm::radians(fov_), aspect_, near_, far_);

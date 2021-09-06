@@ -9,15 +9,15 @@
 
 #include "camera.h"
 #include "controls.h"
-#include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtc/type_ptr.hpp"
 #include "program.h"
 #include "shader.h"
 #include "texture.h"
 
 #define SCR_WIDTH 800
 #define SCR_HEIGHT 600
+
+auto light_position = glm::vec3(1.2f, 1.0f, 2.0f);
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -58,17 +58,6 @@ int main() {
     return -1;
   }
 
-  const auto program = Program(VertexShader("../shader/vertex_shader/texture.vert"),
-                               FragmentShader("../shader/fragment_shader/texture_mix.frag"));
-  program.Use();
-  program.SetUniform("texture1", 0);
-  program.SetUniform("texture2", 1);
-
-  glActiveTexture(GL_TEXTURE0);
-  const auto texture1 = Texture("../resource/texture/container.jpg");
-  glActiveTexture(GL_TEXTURE1);
-  const auto texture2 = Texture("../resource/texture/awesomeface.png");
-
   // 顶点数据
   //  const float vertices[] = {
   //      // ----- 位置 -----, ----- 颜色 -----, --- 纹理坐标 ---
@@ -77,6 +66,7 @@ int main() {
   //      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // 左下角
   //      -0.5f, 0.5f,  0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f   // 左上角
   //  };
+  // 立方体：6 个面 x 每个面 2 个三角形 x 每个三角形 3 个顶点 = 36 个顶点
   const float vertices[] = {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f,  -0.5f, -0.5f, 1.0f, 0.0f,
                             0.5f,  0.5f,  -0.5f, 1.0f, 1.0f, 0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,
                             -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
@@ -140,6 +130,33 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);  // 解绑顶点缓冲对象
   glBindVertexArray(0);              // 解绑顶点数组对象
 
+  // 着色器程序
+  const auto program = Program(VertexShader("../shader/vertex_shader/light.vert"),
+                               FragmentShader("../shader/fragment_shader/illumination.frag"));
+  program.Use();
+  //  program.SetUniform("texture1", 0);
+  //  program.SetUniform("texture2", 1);
+  program.SetUniform("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+  program.SetUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+
+  // 加载纹理
+  //  glActiveTexture(GL_TEXTURE0);
+  //  const auto texture1 = Texture("../resource/texture/container.jpg");
+  //  glActiveTexture(GL_TEXTURE1);
+  //  const auto texture2 = Texture("../resource/texture/awesomeface.png");
+
+  // 光照
+  unsigned int light_vertex_array_object;
+  glGenVertexArrays(1, &light_vertex_array_object);
+  glBindVertexArray(light_vertex_array_object);
+  glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+  glEnableVertexAttribArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindVertexArray(0);
+  const auto light_program = Program(VertexShader("../shader/vertex_shader/light.vert"),
+                                     FragmentShader("../shader/fragment_shader/light.frag"));
+
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   // 默认模式
@@ -171,11 +188,24 @@ int main() {
     // 移动相机
     controls.Update();
 
+    // 灯光位置
+    auto model = glm::mat4(1.0f);
+    model = glm::translate(model, light_position);
+    model = glm::scale(model, glm::vec3(0.2f));
+    light_program.Use();
+    light_program.SetUniform("model", model);
+    light_program.SetUniform("view", camera.ViewMatrix());
+    light_program.SetUniform("projection", camera.ProjectionMatrix());
+
+    // 绘制灯立方体
+    glBindVertexArray(light_vertex_array_object);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
     // 激活着色器程序
     program.Use();
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
-    program.SetUniformMatrix4fv("view", camera.ViewMatrix());
-    program.SetUniformMatrix4fv("projection", camera.ProjectionMatrix());
+    program.SetUniform("view", camera.ViewMatrix());
+    program.SetUniform("projection", camera.ProjectionMatrix());
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
@@ -194,7 +224,7 @@ int main() {
       model_matrix = glm::translate(model_matrix, position);
       model_matrix =
           glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
-      program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
+      program.SetUniform("model", model_matrix);
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 

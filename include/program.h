@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "glm/glm.hpp"
 #include "shader.h"
 
 class Program {
@@ -20,7 +21,9 @@ class Program {
 
   void SetUniform(const std::string& name, int value) const;
 
-  void SetUniformMatrix4fv(const std::string& name, const float* value) const;
+  void SetUniform(const std::string& name, const glm::mat4& value) const;
+
+  void SetUniform(const std::string& name, const glm::vec3& value) const;
 
   // 使用着色器程序
   void Use() const;

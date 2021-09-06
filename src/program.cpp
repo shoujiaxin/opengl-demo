@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 
 Program::Program() : id_(glCreateProgram()) {}
 
@@ -48,6 +49,10 @@ void Program::SetUniform(const std::string &name, int value) const {
   glUniform1i(glGetUniformLocation(id_, name.c_str()), value);
 }
 
-void Program::SetUniformMatrix4fv(const std::string &name, const float *value) const {
-  glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, value);
+void Program::SetUniform(const std::string &name, const glm::mat4 &value) const {
+  glUniformMatrix4fv(glGetUniformLocation(id_, name.c_str()), 1, GL_FALSE, glm::value_ptr(value));
+}
+
+void Program::SetUniform(const std::string &name, const glm::vec3 &value) const {
+  glUniform3fv(glGetUniformLocation(id_, name.c_str()), 1, &value[0]);
 }

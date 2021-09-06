@@ -5,7 +5,6 @@
 #pragma once
 
 #include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 class Camera {
  public:
@@ -28,7 +27,7 @@ class PerspectiveCamera : public Camera {
 
   void LookAt(const glm::vec3& target);
 
-  auto ProjectionMatrix() const -> decltype(glm::value_ptr(glm::mat4()));
+  const glm::mat4& ProjectionMatrix() const;
 
   void SetAspect(float aspect);
 
@@ -42,7 +41,7 @@ class PerspectiveCamera : public Camera {
 
   void UpdateMatrices() override;
 
-  auto ViewMatrix() const -> decltype(glm::value_ptr(glm::mat4()));
+  const glm::mat4& ViewMatrix() const;
 
  private:
   // 宽高比
