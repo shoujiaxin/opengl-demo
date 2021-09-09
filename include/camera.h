@@ -41,11 +41,19 @@ class PerspectiveCamera : public Camera {
 
   void SetPosition(const glm::vec3& value) override;
 
+  const glm::vec3& Target() const;
+
   void UpdateMatrices() override;
 
   const glm::mat4& ViewMatrix() const;
 
  private:
+  // 更新投影矩阵
+  void UpdateProjectionMatrix();
+
+  // 更新观察矩阵
+  void UpdateViewMatrix();
+
   // 宽高比
   float aspect_ = 0.0f;
 
@@ -66,10 +74,4 @@ class PerspectiveCamera : public Camera {
 
   // 观察矩阵
   glm::mat4 view_matrix_ = glm::mat4(1.0f);
-
-  // 更新投影矩阵
-  void UpdateProjectionMatrix();
-
-  // 更新观察矩阵
-  void UpdateViewMatrix();
 };

@@ -154,7 +154,7 @@ int main() {
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/multiple_lights.vert"),
-                               FragmentShader("../shader/fragment_shader/multiple_lights.frag"));
+                               FragmentShader("../shader/fragment_shader/my_multiple_lights.frag"));
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
 
@@ -180,6 +180,19 @@ int main() {
   glBindVertexArray(0);
   const auto light_cube_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
                                           FragmentShader("../shader/fragment_shader/light.frag"));
+  const auto ambient_light = AmbientLight(Color::kWhite, 0.2f);
+  const auto sunlight = DirectionalLight(Color::kRed, 0.8f);
+  std::vector<PointLight> point_lights = {};
+  point_lights.reserve(point_light_positions.size());
+  for (const auto& position : point_light_positions) {
+    auto light = PointLight(Color::kGreen, 0.4f);
+    light.SetPosition(position);
+    light.SetAttenuation({1.0f, 0.09f, 0.032f});
+    point_lights.push_back(light);
+  }
+  auto spotlight = Spotlight(Color::kWhite, 2.0f);
+  spotlight.SetCutOff({cos(glm::radians(15.0f)), cos(glm::radians(20.0f))});
+  spotlight.SetAttenuation({1.0f, 0.09f, 0.032f});
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -206,6 +219,9 @@ int main() {
     // 移动相机
     controls.Update();
 
+    spotlight.SetPosition(camera.Position());
+    spotlight.SetTarget(camera.Target());
+
     // 灯光位置
     light_cube_program.Use();
     light_cube_program.SetUniform("view", camera.ViewMatrix());
@@ -228,53 +244,38 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
 
-    program.SetUniform("directionalLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
-    program.SetUniform("directionalLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    program.SetUniform("directionalLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
-    program.SetUniform("directionalLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+    program.SetUniform("ambientLight.color", ambient_light.Color());
+    program.SetUniform("ambientLight.intensity", ambient_light.Intensity());
 
-    program.SetUniform("pointLights[0].position", point_light_positions[0]);
-    program.SetUniform("pointLights[0].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    program.SetUniform("pointLights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    program.SetUniform("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("pointLights[0].constant", 1.0f);
-    program.SetUniform("pointLights[0].linear", 0.09f);
-    program.SetUniform("pointLights[0].quadratic", 0.032f);
+    program.SetUniform("directionalLights[0].color", sunlight.Color());
+    program.SetUniform("directionalLights[0].intensity", sunlight.Intensity());
+    program.SetUniform("directionalLights[0].direction", sunlight.Direction());
 
-    program.SetUniform("pointLights[1].position", point_light_positions[1]);
-    program.SetUniform("pointLights[1].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    program.SetUniform("pointLights[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    program.SetUniform("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("pointLights[1].constant", 1.0f);
-    program.SetUniform("pointLights[1].linear", 0.09f);
-    program.SetUniform("pointLights[1].quadratic", 0.032f);
+    for (auto i = 0; i < point_lights.size(); ++i) {
+      const auto color_key = "pointLights[" + std::to_string(i) + "].color";
+      const auto intensity_key = "pointLights[" + std::to_string(i) + "].intensity";
+      const auto position_key = "pointLights[" + std::to_string(i) + "].position";
+      const auto constant_key = "pointLights[" + std::to_string(i) + "].constant";
+      const auto linear_key = "pointLights[" + std::to_string(i) + "].linear";
+      const auto quadratic_key = "pointLights[" + std::to_string(i) + "].quadratic";
 
-    program.SetUniform("pointLights[2].position", point_light_positions[2]);
-    program.SetUniform("pointLights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    program.SetUniform("pointLights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    program.SetUniform("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("pointLights[2].constant", 1.0f);
-    program.SetUniform("pointLights[2].linear", 0.09f);
-    program.SetUniform("pointLights[2].quadratic", 0.032f);
+      program.SetUniform(color_key, point_lights[i].Color());
+      program.SetUniform(intensity_key, point_lights[i].Intensity());
+      program.SetUniform(position_key, point_lights[i].Position());
+      program.SetUniform(constant_key, point_lights[i].Attenuation().constant);
+      program.SetUniform(linear_key, point_lights[i].Attenuation().linear);
+      program.SetUniform(quadratic_key, point_lights[i].Attenuation().quadratic);
+    }
 
-    program.SetUniform("pointLights[3].position", point_light_positions[3]);
-    program.SetUniform("pointLights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
-    program.SetUniform("pointLights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
-    program.SetUniform("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("pointLights[3].constant", 1.0f);
-    program.SetUniform("pointLights[3].linear", 0.09f);
-    program.SetUniform("pointLights[3].quadratic", 0.032f);
-
-    program.SetUniform("spotlight.position", camera.Position());
-    program.SetUniform("spotlight.direction", camera.Front());
-    program.SetUniform("spotlight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
-    program.SetUniform("spotlight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("spotlight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-    program.SetUniform("spotlight.constant", 1.0f);
-    program.SetUniform("spotlight.linear", 0.09f);
-    program.SetUniform("spotlight.quadratic", 0.032f);
-    program.SetUniform("spotlight.innerCutOff", glm::cos(glm::radians(12.5f)));
-    program.SetUniform("spotlight.outerCutOff", glm::cos(glm::radians(15.0f)));
+    program.SetUniform("spotlight.color", spotlight.Color());
+    program.SetUniform("spotlight.intensity", spotlight.Intensity());
+    program.SetUniform("spotlight.position", spotlight.Position());
+    program.SetUniform("spotlight.direction", spotlight.Direction());
+    program.SetUniform("spotlight.innerCutOff", spotlight.CutOff().inner);
+    program.SetUniform("spotlight.outerCutOff", spotlight.CutOff().outer);
+    program.SetUniform("spotlight.constant", spotlight.Attenuation().constant);
+    program.SetUniform("spotlight.linear", spotlight.Attenuation().linear);
+    program.SetUniform("spotlight.quadratic", spotlight.Attenuation().quadratic);
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);

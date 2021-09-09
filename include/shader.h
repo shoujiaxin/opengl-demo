@@ -14,13 +14,13 @@ class Shader {
   unsigned int Id() const;
 
  protected:
-  unsigned int id_ = 0;
-
   // 编译着色器
   void Compile(const std::string& source) const;
 
   // 读取着色器 GLSL 文件
   static std::string LoadSourceFrom(const std::string& path);
+
+  unsigned int id_ = 0;
 };
 
 class VertexShader : public Shader {

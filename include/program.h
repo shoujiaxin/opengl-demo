@@ -29,11 +29,11 @@ class Program {
   void Use() const;
 
  private:
-  unsigned int id_ = 0;
-
   // 添加着色器
   void AttachShader(const Shader& shader) const;
 
   // 连接着色器
   void Link() const;
+
+  unsigned int id_ = 0;
 };

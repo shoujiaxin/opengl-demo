@@ -51,6 +51,8 @@ void PerspectiveCamera::SetPosition(const glm::vec3& value) {
   UpdateViewMatrix();
 }
 
+const glm::vec3& PerspectiveCamera::Target() const { return target_; }
+
 void PerspectiveCamera::UpdateMatrices() {
   UpdateProjectionMatrix();
   UpdateViewMatrix();

@@ -4,13 +4,19 @@
 
 #include "light.h"
 
+// Color
+const auto Color::kBlack = Color(0.0f, 0.0f, 0.0f);
+const auto Color::kBlue = Color(0.0f, 0.0f, 1.0f);
+const auto Color::kGreen = Color(0.0f, 1.0f, 0.0f);
+const auto Color::kRed = Color(1.0f, 0.0f, 0.0f);
 const auto Color::kWhite = Color(1.0f, 1.0f, 1.0f);
 
+// Light
 Light::Light(const struct Color &color, float intensity) : color_(color), intensity_(intensity) {}
 
-glm::vec3 Light::Color() const {
-  return intensity_ * glm::vec3(color_.red_, color_.green_, color_.blue_);
-}
+glm::vec3 Light::Color() const { return glm::vec3(color_.red_, color_.green_, color_.blue_); }
+
+float Light::Intensity() const { return intensity_; }
 
 void Light::SetColor(const glm::vec3 &value) { color_ = ::Color(value.x, value.y, value.z); }
 
@@ -20,38 +26,54 @@ void Light::SetColor(float red, float green, float blue) { color_ = ::Color(red,
 
 void Light::SetIntensity(float value) { intensity_ = value; }
 
+// DirectionalLight
 DirectionalLight::DirectionalLight(const struct Color &color, float intensity)
     : Light(color, intensity) {}
+
+DirectionalLight::DirectionalLight(const struct Color &color, float intensity,
+                                   const glm::vec3 &direction)
+    : Light(color, intensity), direction_(direction) {}
 
 const glm::vec3 &DirectionalLight::Direction() const { return direction_; }
 
 void DirectionalLight::SetDirection(const glm::vec3 &value) { direction_ = value; }
 
-PointLight::PointLight(const struct Color &color, float intensity) : Light(color, intensity) {}
+// PositionalLight
+const glm::vec3 &PositionalLight::Position() const { return position_; }
 
-const glm::vec3 &PointLight::Position() const { return position_; }
+void PositionalLight::SetPosition(const glm::vec3 &value) { position_ = value; }
 
-void PointLight::SetPosition(const glm::vec3 &value) { position_ = value; }
+PositionalLight::PositionalLight(const struct Color &color, float intensity)
+    : Light(color, intensity) {}
 
-Spotlight::Spotlight(const struct Color &color, float intensity) : Light(color, intensity) {}
+PositionalLight::PositionalLight(const struct Color &color, float intensity,
+                                 const glm::vec3 &position)
+    : Light(color, intensity), position_(position) {}
 
-const glm::vec3 &Spotlight::Direction() const { return direction_; }
+// PointLight
+PointLight::PointLight(const struct Color &color, float intensity)
+    : PositionalLight(color, intensity) {}
 
-float Spotlight::InnerCutOff() const { return inner_cut_off_; }
+PointLight::PointLight(const struct Color &color, float intensity, const glm::vec3 &position)
+    : PositionalLight(color, intensity, position) {}
 
-float Spotlight::OuterCutOff() const { return outer_cut_off_; }
+const PointLight::Coefficient &PointLight::Attenuation() const { return attenuation_coefficient_; }
 
-const glm::vec3 &Spotlight::Position() const { return position_; }
+void PointLight::SetAttenuation(const Coefficient &value) { attenuation_coefficient_ = value; }
 
-void Spotlight::SetCutOff(float inner, float outer) {
-  inner_cut_off_ = inner;
-  outer_cut_off_ = outer;
-}
+// Spotlight
+Spotlight::Spotlight(const struct Color &color, float intensity) : PointLight(color, intensity) {}
 
-void Spotlight::SetDirection(const glm::vec3 &value) { direction_ = value; }
+Spotlight::Spotlight(const struct Color &color, float intensity, const glm::vec3 &position,
+                     const glm::vec3 &target)
+    : PointLight(color, intensity, position), target_(target) {}
 
-void Spotlight::SetInnerCutOff(float value) { inner_cut_off_ = value; }
+const struct Spotlight::CutOff &Spotlight::CutOff() const { return cut_off_; }
 
-void Spotlight::SetOuterCutOff(float value) { outer_cut_off_ = value; }
+glm::vec3 Spotlight::Direction() const { return target_ - position_; }
 
-void Spotlight::SetPosition(const glm::vec3 &value) { position_ = value; }
+void Spotlight::SetCutOff(const struct CutOff &value) { cut_off_ = value; }
+
+void Spotlight::SetTarget(const glm::vec3 &value) { target_ = value; }
+
+const glm::vec3 &Spotlight::Target() const { return target_; }

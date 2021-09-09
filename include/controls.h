@@ -14,6 +14,12 @@ class Controls {
   void Update();
 
  private:
+  void OnKeyboardPress(float dt);
+
+  void OnMouseMove(double x, double y);
+
+  void OnScroll(double x, double y);
+
   PerspectiveCamera& camera_;
 
   glm::vec3 camera_front_ = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -29,10 +35,4 @@ class Controls {
   float last_frame_time_ = 0.0f;
 
   GLFWwindow* window_;
-
-  void OnKeyboardPress(float dt);
-
-  void OnMouseMove(double x, double y);
-
-  void OnScroll(double x, double y);
 };

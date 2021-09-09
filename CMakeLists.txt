@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 project(learn_opengl)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 # GLFW
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
