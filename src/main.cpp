@@ -160,9 +160,6 @@ int main() {
   const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
                                FragmentShader("../shader/fragment_shader/emission_map.frag"));
   program.Use();
-  program.SetUniform("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-  program.SetUniform("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-  program.SetUniform("material.specular", glm::vec3(0.0f));
   program.SetUniform("material.shininess", 32.0f);
 
   // 加载纹理
@@ -196,9 +193,9 @@ int main() {
   const auto light_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
                                      FragmentShader("../shader/fragment_shader/light.frag"));
   auto ambient_light = AmbientLight(Color::kWhite, 0.2);
-  auto diffuse_light = DiffuseLight(Color::kWhite, 0.5);
+  auto diffuse_light = PointLight(Color::kWhite, 0.5);
   diffuse_light.SetPosition(glm::vec3(1.2f, 1.0f, 2.0f));
-  auto specular_light = SpecularLight(Color::kWhite, 1.0);
+  auto specular_light = PointLight(Color::kWhite, 1.0);
   specular_light.SetPosition(diffuse_light.Position());
 
   // 线框模式

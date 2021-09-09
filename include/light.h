@@ -34,9 +34,9 @@ class Light {
   Light(const struct Color& color, float intensity);
 };
 
-class DirectionalLight : public Light {
+class PointLight : public Light {
  public:
-  DirectionalLight(const struct Color& color, float intensity);
+  PointLight(const struct Color& color, float intensity);
 
   const glm::vec3& Position() const;
 
@@ -49,14 +49,4 @@ class DirectionalLight : public Light {
 class AmbientLight : public Light {
  public:
   AmbientLight(const struct Color& color = Color::kWhite, float intensity = 1.0f);
-};
-
-class DiffuseLight : public DirectionalLight {
- public:
-  DiffuseLight(const struct Color& color = Color::kWhite, float intensity = 1.0f);
-};
-
-class SpecularLight : public DirectionalLight {
- public:
-  SpecularLight(const struct Color& color = Color::kWhite, float intensity = 1.0f);
 };

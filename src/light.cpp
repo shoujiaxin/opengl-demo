@@ -18,17 +18,10 @@ void Light::SetIntensity(float value) { intensity_ = value; }
 
 Light::Light(const struct Color &color, float intensity) : color_(color), intensity_(intensity) {}
 
-DirectionalLight::DirectionalLight(const struct Color &color, float intensity)
-    : Light(color, intensity) {}
+PointLight::PointLight(const struct Color &color, float intensity) : Light(color, intensity) {}
 
-const glm::vec3 &DirectionalLight::Position() const { return position_; }
+const glm::vec3 &PointLight::Position() const { return position_; }
 
-void DirectionalLight::SetPosition(const glm::vec3 &value) { position_ = value; }
+void PointLight::SetPosition(const glm::vec3 &value) { position_ = value; }
 
 AmbientLight::AmbientLight(const struct Color &color, float intensity) : Light(color, intensity) {}
-
-DiffuseLight::DiffuseLight(const struct Color &color, float intensity)
-    : DirectionalLight(color, intensity) {}
-
-SpecularLight::SpecularLight(const struct Color &color, float intensity)
-    : DirectionalLight(color, intensity) {}
