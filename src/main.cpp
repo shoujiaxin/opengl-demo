@@ -158,7 +158,7 @@ int main() {
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
-                               FragmentShader("../shader/fragment_shader/lighting_map.frag"));
+                               FragmentShader("../shader/fragment_shader/emission_map.frag"));
   program.Use();
   program.SetUniform("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
   program.SetUniform("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
@@ -180,6 +180,9 @@ int main() {
   program.SetUniform("material.specular", 1);
   glActiveTexture(GL_TEXTURE1);
   const auto specular_map = Texture("../resource/lighting_map/container2_specular.png");
+  program.SetUniform("material.emission", 2);
+  glActiveTexture(GL_TEXTURE2);
+  const auto emission_map = Texture("../resource/lighting_map/matrix.jpg");
 
   // 光照
   unsigned int light_vertex_array_object;
