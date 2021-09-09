@@ -158,7 +158,7 @@ int main() {
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
-                               FragmentShader("../shader/fragment_shader/point_light.frag"));
+                               FragmentShader("../shader/fragment_shader/spotlight.frag"));
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
 
@@ -199,6 +199,8 @@ int main() {
   specular_light.SetPosition(diffuse_light.Position());
   auto directional_light = DirectionalLight(Color::kWhite, 1.0);
   directional_light.SetDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
+  auto spotlight = Spotlight(Color::kWhite, 1.0);
+  spotlight.SetCutOff(cos(glm::radians(15.0f)), cos(glm::radians(20.0f)));
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -240,6 +242,9 @@ int main() {
     // 移动相机
     controls.Update();
 
+    spotlight.SetPosition(camera.Position());
+    spotlight.SetDirection(camera.Front());
+
     // 灯光位置
     auto model = glm::mat4(1.0f);
     model = glm::translate(model, diffuse_light.Position());
@@ -259,10 +264,11 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
     program.SetUniform("light.position",
-                       glm::vec3(camera.ViewMatrix() * glm::vec4(diffuse_light.Position(), 1.0)));
-    //    program.SetUniform("light.direction", glm::vec3(camera.ViewMatrix() *
-    //                                                    glm::vec4(directional_light.Direction(),
-    //                                                    0.0)));
+                       glm::vec3(camera.ViewMatrix() * glm::vec4(spotlight.Position(), 1.0)));
+    program.SetUniform("light.direction",
+                       glm::vec3(camera.ViewMatrix() * glm::vec4(spotlight.Direction(), 0.0)));
+    program.SetUniform("light.innerCutOff", spotlight.InnerCutOff());
+    program.SetUniform("light.outerCutOff", spotlight.OuterCutOff());
     program.SetUniform("light.ambient", ambient_light.Color());
     program.SetUniform("light.diffuse", diffuse_light.Color());
     program.SetUniform("light.specular", specular_light.Color());

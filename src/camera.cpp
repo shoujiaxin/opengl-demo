@@ -17,6 +17,8 @@ PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float 
 
 float PerspectiveCamera::Fov() const { return fov_; }
 
+glm::vec3 PerspectiveCamera::Front() const { return target_ - position_; }
+
 void PerspectiveCamera::LookAt(const glm::vec3& target) {
   target_ = target;
   UpdateViewMatrix();

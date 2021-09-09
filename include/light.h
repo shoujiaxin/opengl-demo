@@ -18,6 +18,8 @@ struct Color {
 
 class Light {
  public:
+  Light(const struct Color& color, float intensity);
+
   glm::vec3 Color() const;
 
   void SetColor(const glm::vec3& value);
@@ -32,20 +34,6 @@ class Light {
   struct Color color_ = Color::kWhite;
 
   float intensity_ = 1.0f;
-
-  Light(const struct Color& color, float intensity);
-};
-
-class PointLight : public Light {
- public:
-  PointLight(const struct Color& color, float intensity);
-
-  const glm::vec3& Position() const;
-
-  void SetPosition(const glm::vec3& value);
-
- private:
-  glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
 class DirectionalLight : public Light {
@@ -60,7 +48,50 @@ class DirectionalLight : public Light {
   glm::vec3 direction_ = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
-class AmbientLight : public Light {
+class PointLight : public Light {
  public:
-  AmbientLight(const struct Color& color = Color::kWhite, float intensity = 1.0f);
+  PointLight(const struct Color& color, float intensity);
+
+  const glm::vec3& Position() const;
+
+  void SetPosition(const glm::vec3& value);
+
+ private:
+  glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
 };
+
+class Spotlight : public Light {
+ public:
+  Spotlight(const struct Color& color, float intensity);
+
+  const glm::vec3& Direction() const;
+
+  float InnerCutOff() const;
+
+  float OuterCutOff() const;
+
+  const glm::vec3& Position() const;
+
+  void SetCutOff(float inner, float outer);
+
+  void SetDirection(const glm::vec3& value);
+
+  void SetInnerCutOff(float value);
+
+  void SetOuterCutOff(float value);
+
+  void SetPosition(const glm::vec3& value);
+
+ private:
+  glm::vec3 direction_ = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  // 内切光角的余弦值
+  float inner_cut_off_ = 0.0f;
+
+  // 外切光角的余弦值
+  float outer_cut_off_ = 0.0f;
+
+  glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
+};
+
+using AmbientLight = Light;

@@ -34,9 +34,6 @@ class Program {
   // 添加着色器
   void AttachShader(const Shader& shader) const;
 
-  // 删除着色器程序
-  void Delete() const;
-
   // 连接着色器
   void Link() const;
 };

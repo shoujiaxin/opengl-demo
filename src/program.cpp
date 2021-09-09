@@ -17,13 +17,11 @@ Program::Program(const Shader &vertex_shader, const Shader &fragment_shader) : P
   Link();
 }
 
-Program::~Program() { Delete(); }
+Program::~Program() { glDeleteProgram(id_); }
 
 void Program::Use() const { glUseProgram(id_); }
 
 void Program::AttachShader(const Shader &shader) const { glAttachShader(id_, shader.Id()); }
-
-void Program::Delete() const { glDeleteProgram(id_); }
 
 void Program::Link() const {
   glLinkProgram(id_);

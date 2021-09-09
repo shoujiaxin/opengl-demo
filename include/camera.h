@@ -25,6 +25,8 @@ class PerspectiveCamera : public Camera {
 
   float Fov() const;
 
+  glm::vec3 Front() const;
+
   void LookAt(const glm::vec3& target);
 
   const glm::mat4& ProjectionMatrix() const;

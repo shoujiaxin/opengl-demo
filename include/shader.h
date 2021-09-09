@@ -21,10 +21,6 @@ class Shader {
 
   // 读取着色器 GLSL 文件
   static std::string LoadSourceFrom(const std::string& path);
-
- private:
-  // 删除着色器
-  void Delete() const;
 };
 
 class VertexShader : public Shader {

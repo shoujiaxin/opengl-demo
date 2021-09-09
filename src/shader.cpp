@@ -10,7 +10,7 @@
 
 #include "glad/glad.h"
 
-Shader::~Shader() { Delete(); }
+Shader::~Shader() { glDeleteShader(id_); }
 
 unsigned int Shader::Id() const { return id_; }
 
@@ -38,8 +38,6 @@ std::string Shader::LoadSourceFrom(const std::string &path) {
   stream << file.rdbuf();
   return stream.str();
 }
-
-void Shader::Delete() const { glDeleteShader(id_); }
 
 VertexShader::VertexShader(const std::string &path) {
   id_ = glCreateShader(GL_VERTEX_SHADER);
