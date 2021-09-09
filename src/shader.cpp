@@ -30,6 +30,10 @@ void Shader::Compile(const std::string &source) const {
 
 std::string Shader::LoadSourceFrom(const std::string &path) {
   auto file = std::ifstream(path);
+  if (file.fail()) {
+    std::cerr << "File not found: " << path << std::endl;
+    return "";
+  }
   std::stringstream stream;
   stream << file.rdbuf();
   return stream.str();
