@@ -258,8 +258,11 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("light.position", diffuse_light.Position());
-    //    program.SetUniform("light.direction", directional_light.Direction());
+    program.SetUniform("light.position",
+                       glm::vec3(camera.ViewMatrix() * glm::vec4(diffuse_light.Position(), 1.0)));
+    //    program.SetUniform("light.direction", glm::vec3(camera.ViewMatrix() *
+    //                                                    glm::vec4(directional_light.Direction(),
+    //                                                    0.0)));
     program.SetUniform("light.ambient", ambient_light.Color());
     program.SetUniform("light.diffuse", diffuse_light.Color());
     program.SetUniform("light.specular", specular_light.Color());
