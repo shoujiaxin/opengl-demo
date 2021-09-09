@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(learn_opengl)
+project(opengl-demo)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -27,6 +27,6 @@ include_directories(include)
 
 file(GLOB SOURCE_FILES src/*.cpp)
 
-add_executable(learn_opengl ${SOURCE_FILES})
+add_executable(Demo ${SOURCE_FILES})
 
-target_link_libraries(learn_opengl glfw glad assimp)
+target_link_libraries(Demo glfw glad assimp)

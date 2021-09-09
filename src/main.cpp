@@ -40,7 +40,7 @@ int main() {
 #endif
 
   // 创建窗口
-  auto window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Learn OpenGL", nullptr, nullptr);
+  const auto window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Demo", nullptr, nullptr);
   if (window == nullptr) {
     std::cerr << "Failed to create GLFW window" << std::endl;
     glfwTerminate();
