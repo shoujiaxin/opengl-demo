@@ -58,13 +58,6 @@ int main() {
   }
 
   // 顶点数据
-  //  const float vertices[] = {
-  //      // ----- 位置 -----, ----- 颜色 -----, --- 纹理坐标 ---
-  //      0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,  // 右上角
-  //      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,  // 右下角
-  //      -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // 左下角
-  //      -0.5f, 0.5f,  0.0f, 0.5f, 0.5f, 0.5f, 0.0f, 1.0f   // 左上角
-  //  };
   // 立方体：6 个面 x 每个面 2 个三角形 x 每个三角形 3 个顶点 = 36 个顶点
   constexpr float vertices[] = {
       // ----- 位置 -----, ------ 法向量 ------, --- 纹理坐标 ---
@@ -120,6 +113,9 @@ int main() {
                              glm::vec3(2.4f, -0.4f, -3.5f),  glm::vec3(-1.7f, 3.0f, -7.5f),
                              glm::vec3(1.3f, -2.0f, -2.5f),  glm::vec3(1.5f, 2.0f, -2.5f),
                              glm::vec3(1.5f, 0.2f, -1.5f),   glm::vec3(-1.3f, 1.0f, -1.5f)};
+  const auto point_light_positions =
+      std::vector<glm::vec3>{glm::vec3(0.7f, 0.2f, 2.0f), glm::vec3(2.3f, -3.3f, -4.0f),
+                             glm::vec3(-4.0f, 2.0f, -12.0f), glm::vec3(0.0f, 0.0f, -3.0f)};
 
   unsigned int vertex_array_object;    // 顶点数组对象
   unsigned int vertex_buffer_object;   // 顶点缓冲对象
@@ -157,18 +153,10 @@ int main() {
   glBindVertexArray(0);              // 解绑顶点数组对象
 
   // 着色器程序
-  const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
-                               FragmentShader("../shader/fragment_shader/spotlight.frag"));
+  const auto program = Program(VertexShader("../shader/vertex_shader/multiple_lights.vert"),
+                               FragmentShader("../shader/fragment_shader/multiple_lights.frag"));
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
-
-  // 加载纹理
-  //  program.SetUniform("texture1", 0);
-  //  glActiveTexture(GL_TEXTURE0);
-  //  const auto texture1 = Texture("../resource/texture/container.jpg");
-  //  program.SetUniform("texture2", 1);
-  //  glActiveTexture(GL_TEXTURE1);
-  //  const auto texture2 = Texture("../resource/texture/awesomeface.png");
 
   // 加载光照贴图
   program.SetUniform("material.diffuse", 0);
@@ -190,17 +178,8 @@ int main() {
   glEnableVertexAttribArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
-  const auto light_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
-                                     FragmentShader("../shader/fragment_shader/light.frag"));
-  auto ambient_light = AmbientLight(Color::kWhite, 0.2);
-  auto diffuse_light = PointLight(Color::kWhite, 0.5);
-  diffuse_light.SetPosition(glm::vec3(1.2f, 1.0f, 2.0f));
-  auto specular_light = PointLight(Color::kWhite, 1.0);
-  specular_light.SetPosition(diffuse_light.Position());
-  auto directional_light = DirectionalLight(Color::kWhite, 1.0);
-  directional_light.SetDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
-  auto spotlight = Spotlight(Color::kWhite, 1.0);
-  spotlight.SetCutOff(cos(glm::radians(15.0f)), cos(glm::radians(20.0f)));
+  const auto light_cube_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
+                                          FragmentShader("../shader/fragment_shader/light.frag"));
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -224,35 +203,20 @@ int main() {
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // 模型矩阵
-    //    auto model_matrix = glm::mat4(1.0f);
-    //    model_matrix =
-    //        glm::rotate(model_matrix, static_cast<float>(glfwGetTime()) * glm::radians(-55.0f),
-    //                    glm::vec3(0.5f, 1.0f, 0.0f));
-
-    // 改变光照颜色
-    const auto current_time = glfwGetTime();
-    const auto light_color =
-        glm::vec3(sin(current_time * 2.0f), sin(current_time * 0.7f), sin(current_time * 1.3f));
-    //    diffuse_light.SetColor(light_color);
-    //    diffuse_light.SetIntensity(0.5f);
-    //    ambient_light.SetColor(light_color);
-    //    ambient_light.SetIntensity(0.2f);
-
     // 移动相机
     controls.Update();
 
-    spotlight.SetPosition(camera.Position());
-    spotlight.SetDirection(camera.Front());
-
     // 灯光位置
-    auto model = glm::mat4(1.0f);
-    model = glm::translate(model, diffuse_light.Position());
-    model = glm::scale(model, glm::vec3(0.2f));
-    light_program.Use();
-    light_program.SetUniform("model", model);
-    light_program.SetUniform("view", camera.ViewMatrix());
-    light_program.SetUniform("projection", camera.ProjectionMatrix());
+    light_cube_program.Use();
+    light_cube_program.SetUniform("view", camera.ViewMatrix());
+    light_cube_program.SetUniform("projection", camera.ProjectionMatrix());
+    for (const auto& position : point_light_positions) {
+      auto model_matrix = glm::mat4(1.0f);
+      model_matrix = glm::translate(model_matrix, position);
+      model_matrix = glm::scale(model_matrix, glm::vec3(0.2f));
+      light_cube_program.SetUniform("model", model_matrix);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     // 绘制灯立方体
     glBindVertexArray(light_vertex_array_object);
@@ -263,23 +227,54 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("light.position",
-                       glm::vec3(camera.ViewMatrix() * glm::vec4(spotlight.Position(), 1.0)));
-    program.SetUniform("light.direction",
-                       glm::vec3(camera.ViewMatrix() * glm::vec4(spotlight.Direction(), 0.0)));
-    program.SetUniform("light.innerCutOff", spotlight.InnerCutOff());
-    program.SetUniform("light.outerCutOff", spotlight.OuterCutOff());
-    program.SetUniform("light.ambient", ambient_light.Color());
-    program.SetUniform("light.diffuse", diffuse_light.Color());
-    program.SetUniform("light.specular", specular_light.Color());
-    program.SetUniform("light.constant", 1.0f);
-    program.SetUniform("light.linear", 0.09f);
-    program.SetUniform("light.quadratic", 0.032f);
 
-    //    const auto time_value = glfwGetTime();
-    //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
-    //    const auto vertex_color_location = glGetUniformLocation(shader_program, "ourColor");
-    //    glUniform4f(vertex_color_location, 0.0f, green_value, 0.0f, 1.0f);
+    program.SetUniform("directionalLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+    program.SetUniform("directionalLight.ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    program.SetUniform("directionalLight.diffuse", glm::vec3(0.4f, 0.4f, 0.4f));
+    program.SetUniform("directionalLight.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+    program.SetUniform("pointLights[0].position", point_light_positions[0]);
+    program.SetUniform("pointLights[0].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    program.SetUniform("pointLights[0].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    program.SetUniform("pointLights[0].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("pointLights[0].constant", 1.0f);
+    program.SetUniform("pointLights[0].linear", 0.09f);
+    program.SetUniform("pointLights[0].quadratic", 0.032f);
+
+    program.SetUniform("pointLights[1].position", point_light_positions[1]);
+    program.SetUniform("pointLights[1].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    program.SetUniform("pointLights[1].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    program.SetUniform("pointLights[1].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("pointLights[1].constant", 1.0f);
+    program.SetUniform("pointLights[1].linear", 0.09f);
+    program.SetUniform("pointLights[1].quadratic", 0.032f);
+
+    program.SetUniform("pointLights[2].position", point_light_positions[2]);
+    program.SetUniform("pointLights[2].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    program.SetUniform("pointLights[2].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    program.SetUniform("pointLights[2].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("pointLights[2].constant", 1.0f);
+    program.SetUniform("pointLights[2].linear", 0.09f);
+    program.SetUniform("pointLights[2].quadratic", 0.032f);
+
+    program.SetUniform("pointLights[3].position", point_light_positions[3]);
+    program.SetUniform("pointLights[3].ambient", glm::vec3(0.05f, 0.05f, 0.05f));
+    program.SetUniform("pointLights[3].diffuse", glm::vec3(0.8f, 0.8f, 0.8f));
+    program.SetUniform("pointLights[3].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("pointLights[3].constant", 1.0f);
+    program.SetUniform("pointLights[3].linear", 0.09f);
+    program.SetUniform("pointLights[3].quadratic", 0.032f);
+
+    program.SetUniform("spotlight.position", camera.Position());
+    program.SetUniform("spotlight.direction", camera.Front());
+    program.SetUniform("spotlight.ambient", glm::vec3(0.0f, 0.0f, 0.0f));
+    program.SetUniform("spotlight.diffuse", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("spotlight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    program.SetUniform("spotlight.constant", 1.0f);
+    program.SetUniform("spotlight.linear", 0.09f);
+    program.SetUniform("spotlight.quadratic", 0.032f);
+    program.SetUniform("spotlight.innerCutOff", glm::cos(glm::radians(12.5f)));
+    program.SetUniform("spotlight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);
