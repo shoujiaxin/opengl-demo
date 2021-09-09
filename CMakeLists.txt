@@ -19,10 +19,14 @@ include_directories(third_party/glm)
 # stb
 include_directories(third_party/stb)
 
+# assimp
+add_subdirectory(third_party/assimp)
+include_directories(third_party/assimp/include)
+
 include_directories(include)
 
 file(GLOB SOURCE_FILES src/*.cpp)
 
 add_executable(learn_opengl ${SOURCE_FILES})
 
-target_link_libraries(learn_opengl glfw glad)
+target_link_libraries(learn_opengl glfw glad assimp)
