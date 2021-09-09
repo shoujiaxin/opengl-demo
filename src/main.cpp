@@ -158,7 +158,7 @@ int main() {
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
-                               FragmentShader("../shader/fragment_shader/directional_light.frag"));
+                               FragmentShader("../shader/fragment_shader/point_light.frag"));
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
 
@@ -258,11 +258,14 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    //    program.SetUniform("light.position", diffuse_light.Position());
-    program.SetUniform("light.direction", directional_light.Direction());
+    program.SetUniform("light.position", diffuse_light.Position());
+    //    program.SetUniform("light.direction", directional_light.Direction());
     program.SetUniform("light.ambient", ambient_light.Color());
     program.SetUniform("light.diffuse", diffuse_light.Color());
     program.SetUniform("light.specular", specular_light.Color());
+    program.SetUniform("light.constant", 1.0f);
+    program.SetUniform("light.linear", 0.09f);
+    program.SetUniform("light.quadratic", 0.032f);
 
     //    const auto time_value = glfwGetTime();
     //    const auto green_value = static_cast<float>(sin(time_value / 2.0f)) + 0.5f;
