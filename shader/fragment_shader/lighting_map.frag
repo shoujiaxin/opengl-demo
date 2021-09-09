@@ -15,7 +15,6 @@ struct Material {
 
 in vec3 FragPos;
 in vec3 Normal;
-in vec3 LightPos;
 in vec2 TexCoords;
 
 out vec4 FragColor;
@@ -29,7 +28,7 @@ void main() {
 
     // 漫反射光照
     vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(LightPos - FragPos);
+    vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
 

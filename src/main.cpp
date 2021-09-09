@@ -256,7 +256,7 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("lightPos", diffuse_light.Position());
+    program.SetUniform("light.position", diffuse_light.Position());
     program.SetUniform("light.ambient", ambient_light.Color());
     program.SetUniform("light.diffuse", diffuse_light.Color());
     program.SetUniform("light.specular", specular_light.Color());
