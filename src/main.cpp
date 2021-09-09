@@ -15,8 +15,8 @@
 #include "shader.h"
 #include "texture.h"
 
-#define SCR_WIDTH 800
-#define SCR_HEIGHT 600
+#define SCR_WIDTH 1200
+#define SCR_HEIGHT 800
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -158,7 +158,7 @@ int main() {
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/lighting_map.vert"),
-                               FragmentShader("../shader/fragment_shader/emission_map.frag"));
+                               FragmentShader("../shader/fragment_shader/directional_light.frag"));
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
 
@@ -177,9 +177,9 @@ int main() {
   program.SetUniform("material.specular", 1);
   glActiveTexture(GL_TEXTURE1);
   const auto specular_map = Texture("../resource/lighting_map/container2_specular.png");
-  program.SetUniform("material.emission", 2);
-  glActiveTexture(GL_TEXTURE2);
-  const auto emission_map = Texture("../resource/lighting_map/matrix.jpg");
+  //  program.SetUniform("material.emission", 2);
+  //  glActiveTexture(GL_TEXTURE2);
+  //  const auto emission_map = Texture("../resource/lighting_map/matrix.jpg");
 
   // 光照
   unsigned int light_vertex_array_object;
@@ -197,6 +197,8 @@ int main() {
   diffuse_light.SetPosition(glm::vec3(1.2f, 1.0f, 2.0f));
   auto specular_light = PointLight(Color::kWhite, 1.0);
   specular_light.SetPosition(diffuse_light.Position());
+  auto directional_light = DirectionalLight(Color::kWhite, 1.0);
+  directional_light.SetDirection(glm::vec3(-0.2f, -1.0f, -0.3f));
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -256,7 +258,8 @@ int main() {
     //    program.SetUniformMatrix4fv("model", glm::value_ptr(model_matrix));
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("light.position", diffuse_light.Position());
+    //    program.SetUniform("light.position", diffuse_light.Position());
+    program.SetUniform("light.direction", directional_light.Direction());
     program.SetUniform("light.ambient", ambient_light.Color());
     program.SetUniform("light.diffuse", diffuse_light.Color());
     program.SetUniform("light.specular", specular_light.Color());
@@ -271,18 +274,18 @@ int main() {
     //    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
     //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // 矩形
     //    glDrawArrays(GL_TRIANGLES, 0, 36);  // 立方体
-    //    std::default_random_engine e;
-    //    std::uniform_int_distribution<unsigned> u(0, cube_positions.size());
-    //    for (const auto& position : cube_positions) {
-    //      auto model_matrix = glm::mat4(1.0f);
-    //      model_matrix = glm::translate(model_matrix, position);
-    //      model_matrix =
-    //          glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
-    //      program.SetUniform("model", model_matrix);
-    //      glDrawArrays(GL_TRIANGLES, 0, 36);
-    //    }
-    program.SetUniform("model", glm::mat4(1.0f));
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    std::default_random_engine e;
+    std::uniform_int_distribution<unsigned> u(0, cube_positions.size());
+    for (const auto& position : cube_positions) {
+      auto model_matrix = glm::mat4(1.0f);
+      model_matrix = glm::translate(model_matrix, position);
+      model_matrix =
+          glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
+      program.SetUniform("model", model_matrix);
+      glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
+    //    program.SetUniform("model", glm::mat4(1.0f));
+    //    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
     glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）

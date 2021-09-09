@@ -24,6 +24,8 @@ class Light {
 
   void SetColor(const struct Color& value);
 
+  void SetColor(float red, float green, float blue);
+
   void SetIntensity(float value);
 
  protected:
@@ -44,6 +46,18 @@ class PointLight : public Light {
 
  private:
   glm::vec3 position_ = glm::vec3(0.0f, 0.0f, 0.0f);
+};
+
+class DirectionalLight : public Light {
+ public:
+  DirectionalLight(const struct Color& color, float intensity);
+
+  const glm::vec3& Direction() const;
+
+  void SetDirection(const glm::vec3& value);
+
+ private:
+  glm::vec3 direction_ = glm::vec3(0.0f, 0.0f, 0.0f);
 };
 
 class AmbientLight : public Light {
