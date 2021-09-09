@@ -42,3 +42,5 @@ void Texture::SetFiltering(int operation, int method) const {
 }
 
 void Texture::SetWrap(int axis, int mode) const { glTexParameteri(GL_TEXTURE_2D, axis, mode); }
+
+enum Texture::Type Texture::Type() const { return type_; }

@@ -1,5 +1,5 @@
 //
-// Created by martinshou on 2021/7/21.
+// Created by Jiaxin Shou on 2021/7/21.
 //
 
 #include "shader.h"

@@ -1,11 +1,10 @@
 //
-// Created by martinshou on 2021/9/6.
+// Created by Jiaxin Shou on 2021/9/6.
 //
 
 #pragma once
 
 #include <algorithm>
-#include <vector>
 
 #include "glm/glm.hpp"
 
@@ -59,7 +58,8 @@ class DirectionalLight : public Light {
   void SetDirection(const glm::vec3& value);
 
  private:
-  glm::vec3 direction_ = glm::vec3(0.0f, -1.0f, 0.0f);  // 默认方向竖直向下
+  // 方向，默认竖直向下
+  glm::vec3 direction_ = glm::vec3(0.0f, -1.0f, 0.0f);
 };
 
 class PositionalLight : public Light {
@@ -79,9 +79,14 @@ class PositionalLight : public Light {
 class PointLight : public PositionalLight {
  public:
   struct Coefficient {
-    float constant = 0.0f;   // 常数项
-    float linear = 0.0f;     // 一次项
-    float quadratic = 0.0f;  // 二次项
+    // 常数项
+    float constant_ = 0.0f;
+
+    // 一次项
+    float linear_ = 0.0f;
+
+    // 二次项
+    float quadratic_ = 0.0f;
   };
 
   PointLight(const struct Color& color, float intensity);
@@ -100,8 +105,11 @@ class PointLight : public PositionalLight {
 class Spotlight : public PointLight {
  public:
   struct CutOff {
-    float inner = 0.0f;  // 内切光角余弦值
-    float outer = 0.0f;  // 外切光角余弦值
+    // 内切光角余弦值
+    float inner_ = 0.0f;
+
+    // 外切光角余弦值
+    float outer_ = 0.0f;
   };
 
   Spotlight(const struct Color& color, float intensity);

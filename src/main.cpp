@@ -257,25 +257,25 @@ int main() {
       const auto position_key = "pointLights[" + std::to_string(i) + "].position";
       const auto constant_key = "pointLights[" + std::to_string(i) + "].constant";
       const auto linear_key = "pointLights[" + std::to_string(i) + "].linear";
-      const auto quadratic_key = "pointLights[" + std::to_string(i) + "].quadratic";
+      const auto quadratic_key = "pointLights[" + std::to_string(i) + "].quadratic_";
 
       program.SetUniform(color_key, point_lights[i].Color());
       program.SetUniform(intensity_key, point_lights[i].Intensity());
       program.SetUniform(position_key, point_lights[i].Position());
-      program.SetUniform(constant_key, point_lights[i].Attenuation().constant);
-      program.SetUniform(linear_key, point_lights[i].Attenuation().linear);
-      program.SetUniform(quadratic_key, point_lights[i].Attenuation().quadratic);
+      program.SetUniform(constant_key, point_lights[i].Attenuation().constant_);
+      program.SetUniform(linear_key, point_lights[i].Attenuation().linear_);
+      program.SetUniform(quadratic_key, point_lights[i].Attenuation().quadratic_);
     }
 
     program.SetUniform("spotlight.color", spotlight.Color());
     program.SetUniform("spotlight.intensity", spotlight.Intensity());
     program.SetUniform("spotlight.position", spotlight.Position());
     program.SetUniform("spotlight.direction", spotlight.Direction());
-    program.SetUniform("spotlight.innerCutOff", spotlight.CutOff().inner);
-    program.SetUniform("spotlight.outerCutOff", spotlight.CutOff().outer);
-    program.SetUniform("spotlight.constant", spotlight.Attenuation().constant);
-    program.SetUniform("spotlight.linear", spotlight.Attenuation().linear);
-    program.SetUniform("spotlight.quadratic", spotlight.Attenuation().quadratic);
+    program.SetUniform("spotlight.innerCutOff", spotlight.CutOff().inner_);
+    program.SetUniform("spotlight.outerCutOff", spotlight.CutOff().outer_);
+    program.SetUniform("spotlight.constant", spotlight.Attenuation().constant_);
+    program.SetUniform("spotlight.linear", spotlight.Attenuation().linear_);
+    program.SetUniform("spotlight.quadratic_", spotlight.Attenuation().quadratic_);
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);

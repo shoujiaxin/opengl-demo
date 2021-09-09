@@ -8,6 +8,8 @@
 
 class Texture {
  public:
+  enum class Type { kDefault, kDiffuseMapping, kSpecularMapping };
+
   explicit Texture(const std::string& path);
 
   ~Texture();
@@ -21,10 +23,14 @@ class Texture {
   // 设置环绕方式
   void SetWrap(int axis, int mode) const;
 
+  Type Type() const;
+
  private:
   int height_ = 0;
 
   unsigned int id_ = 0;
+
+  enum Type type_ = Type::kDefault;
 
   int width_ = 0;
 };

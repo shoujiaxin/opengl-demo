@@ -1,5 +1,5 @@
 //
-// Created by martinshou on 2021/9/2.
+// Created by Jiaxin Shou on 2021/9/2.
 //
 
 #include "camera.h"
