@@ -5,7 +5,7 @@
 #pragma once
 
 #include "GLFW/glfw3.h"
-#include "camera.h"
+#include "cameras.h"
 
 class Controls {
  public:

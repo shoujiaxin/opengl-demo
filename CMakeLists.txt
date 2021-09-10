@@ -25,7 +25,10 @@ include_directories(third_party/assimp/include)
 
 include_directories(include)
 
-file(GLOB SOURCE_FILES src/*.cpp)
+file(GLOB SOURCE_FILES
+        src/*.cpp
+        src/*/*.cpp
+        )
 
 add_executable(Demo ${SOURCE_FILES})
 

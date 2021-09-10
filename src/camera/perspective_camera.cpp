@@ -1,18 +1,14 @@
 //
-// Created by Jiaxin Shou on 2021/9/2.
+// Created by Jiaxin Shou on 2021/9/10.
 //
 
-#include "camera.h"
+#include "perspective_camera.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 
-const glm::vec3& Camera::Position() const { return position_; }
-
-void Camera::SetPosition(const glm::vec3& value) { position_ = value; }
-
 PerspectiveCamera::PerspectiveCamera(float fov, float aspect, float near, float far)
     : fov_(fov), aspect_(aspect), near_(near), far_(far) {
-  UpdateMatrices();
+  PerspectiveCamera::UpdateMatrices();
 }
 
 float PerspectiveCamera::Fov() const { return fov_; }

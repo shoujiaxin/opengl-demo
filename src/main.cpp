@@ -7,10 +7,10 @@
 #include <random>
 #include <vector>
 
-#include "camera.h"
+#include "cameras.h"
 #include "controls.h"
 #include "glm/gtc/matrix_transform.hpp"
-#include "light.h"
+#include "lights.h"
 #include "model.h"
 #include "program.h"
 #include "shader.h"
