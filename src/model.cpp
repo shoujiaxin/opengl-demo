@@ -17,11 +17,12 @@ Model::Model(const std::string &path) {
 
 void Model::Draw(const Program &program) const {
   for (const auto &mesh : meshes_) {
-    mesh.Draw(program);
+    mesh->Draw(program);
   }
 }
 
-std::vector<Texture> Model::LoadMaterialTextures(const aiMaterial *material, aiTextureType type) {
+std::vector<std::shared_ptr<Texture>> Model::LoadMaterialTextures(const aiMaterial *material,
+                                                                  aiTextureType type) {
   auto texture_type = Texture::Type::kDefault;
   switch (type) {
     case aiTextureType_DIFFUSE:
@@ -35,7 +36,7 @@ std::vector<Texture> Model::LoadMaterialTextures(const aiMaterial *material, aiT
   }
 
   const auto num_textures = material->GetTextureCount(type);
-  std::vector<Texture> textures;
+  std::vector<std::shared_ptr<Texture>> textures;
   textures.reserve(num_textures);
   for (auto i = 0; i < num_textures; ++i) {
     // 相对路径
@@ -43,10 +44,10 @@ std::vector<Texture> Model::LoadMaterialTextures(const aiMaterial *material, aiT
     material->GetTexture(type, i, &path);
 
     // 绝对路径
-    const auto texture_path = directory_ + std::string(path.C_Str());
+    const auto texture_path = directory_ + '/' + std::string(path.C_Str());
 
     if (texture_cache_.find(texture_path) == texture_cache_.cend()) {
-      textures.emplace_back(texture_path, texture_type);
+      textures.emplace_back(std::make_shared<Texture>(texture_path, texture_type));
       texture_cache_.insert({texture_path, textures.back()});
     } else {
       textures.push_back(texture_cache_[texture_path]);
@@ -58,7 +59,7 @@ std::vector<Texture> Model::LoadMaterialTextures(const aiMaterial *material, aiT
 
 void Model::LoadModelFrom(const std::string &path) {
   Assimp::Importer importer;
-  const auto scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
+  const auto scene = importer.ReadFile(path, aiProcess_Triangulate);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
     std::cerr << "Failed to load model: " << path << std::endl;
@@ -69,24 +70,31 @@ void Model::LoadModelFrom(const std::string &path) {
   ProcessNode(scene, scene->mRootNode);
 }
 
-Mesh Model::ProcessMesh(const aiScene *scene, const aiMesh *mesh) {
+std::shared_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mesh) {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
-  std::vector<Texture> textures;
+  std::vector<std::shared_ptr<Texture>> textures;
 
   // 顶点
   const auto num_vertices = mesh->mNumVertices;
   vertices.reserve(num_vertices);
   for (auto i = 0; i < num_vertices; ++i) {
-    const auto position =
-        glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-    const auto normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-    const auto texture_coordinates =
-        (mesh->mTextureCoords[0])
-            ? glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y)
-            : glm::vec2(0.0f, 0.0f);
+    auto vertex = Vertex();
 
-    vertices.emplace_back(position, normal, texture_coordinates);
+    vertex.position_ =
+        std::move(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+
+    if (mesh->HasNormals()) {
+      vertex.normal_ =
+          std::move(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+    }
+
+    if (mesh->mTextureCoords[0]) {
+      vertex.texture_coordinates_ =
+          std::move(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
+    }
+
+    vertices.emplace_back(std::move(vertex));
   }
 
   // 索引
@@ -108,13 +116,13 @@ Mesh Model::ProcessMesh(const aiScene *scene, const aiMesh *mesh) {
     textures.insert(textures.end(), specular_maps.cbegin(), specular_maps.cend());
   }
 
-  return {vertices, indices, textures};
+  return std::make_shared<Mesh>(vertices, indices, textures);
 }
 
 void Model::ProcessNode(const aiScene *scene, const aiNode *node) {
   for (auto i = 0; i < node->mNumMeshes; ++i) {
     const auto mesh = scene->mMeshes[node->mMeshes[i]];
-    meshes_.push_back(ProcessMesh(scene, mesh));
+    meshes_.emplace_back(std::move(ProcessMesh(scene, mesh)));
   }
 
   for (auto i = 0; i < node->mNumChildren; ++i) {
@@ -122,4 +130,4 @@ void Model::ProcessNode(const aiScene *scene, const aiNode *node) {
   }
 }
 
-std::unordered_map<std::string, Texture> Model::texture_cache_{};
+std::unordered_map<std::string, std::shared_ptr<Texture>> Model::texture_cache_{};

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -19,18 +20,19 @@ class Model {
   void Draw(const Program& program) const;
 
  private:
-  std::vector<Texture> LoadMaterialTextures(const aiMaterial* material, aiTextureType type);
+  std::vector<std::shared_ptr<Texture>> LoadMaterialTextures(const aiMaterial* material,
+                                                             aiTextureType type);
 
   void LoadModelFrom(const std::string& path);
 
-  Mesh ProcessMesh(const aiScene* scene, const aiMesh* mesh);
+  std::shared_ptr<Mesh> ProcessMesh(const aiScene* scene, const aiMesh* mesh);
 
   void ProcessNode(const aiScene* scene, const aiNode* node);
 
   std::string directory_;
 
-  std::vector<Mesh> meshes_;
+  std::vector<std::shared_ptr<Mesh>> meshes_;
 
   // 纹理缓存
-  static std::unordered_map<std::string, Texture> texture_cache_;
+  static std::unordered_map<std::string, std::shared_ptr<Texture>> texture_cache_;
 };

@@ -11,6 +11,7 @@
 #include "controls.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "light.h"
+#include "model.h"
 #include "program.h"
 #include "shader.h"
 #include "texture.h"
@@ -149,8 +150,8 @@ int main() {
   glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
-  glBindBuffer(GL_ARRAY_BUFFER, 0);  // 解绑顶点缓冲对象
-  glBindVertexArray(0);              // 解绑顶点数组对象
+  // 解绑顶点数组对象
+  glBindVertexArray(0);
 
   // 着色器程序
   const auto program = Program(VertexShader("../shader/vertex_shader/multiple_lights.vert"),
@@ -176,7 +177,6 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
   const auto light_cube_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
                                           FragmentShader("../shader/fragment_shader/light.frag"));
@@ -193,6 +193,12 @@ int main() {
   auto spotlight = Spotlight(Color::kWhite, 2.0f);
   spotlight.SetCutOff({cos(glm::radians(15.0f)), cos(glm::radians(20.0f))});
   spotlight.SetAttenuation({1.0f, 0.09f, 0.032f});
+
+  // 模型
+  const auto model_program = Program(VertexShader("../shader/vertex_shader/model.vert"),
+                                     FragmentShader("../shader/fragment_shader/model.frag"));
+  model_program.Use();
+  const auto model = Model("../resource/model/nanosuit/nanosuit.obj");
 
   // 线框模式
   //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -222,10 +228,11 @@ int main() {
     spotlight.SetPosition(camera.Position());
     spotlight.SetTarget(camera.Target());
 
-    // 灯光位置
+    // 灯光立方体
     light_cube_program.Use();
     light_cube_program.SetUniform("view", camera.ViewMatrix());
     light_cube_program.SetUniform("projection", camera.ProjectionMatrix());
+    glBindVertexArray(light_vertex_array_object);
     for (const auto& position : point_light_positions) {
       auto model_matrix = glm::mat4(1.0f);
       model_matrix = glm::translate(model_matrix, position);
@@ -233,10 +240,6 @@ int main() {
       light_cube_program.SetUniform("model", model_matrix);
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-
-    // 绘制灯立方体
-    glBindVertexArray(light_vertex_array_object);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     // 激活着色器程序
     program.Use();
@@ -294,6 +297,14 @@ int main() {
     }
     //    program.SetUniform("model", glm::mat4(1.0f));
     //    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    model_program.Use();
+    auto model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
+    model_program.SetUniform("view", camera.ViewMatrix());
+    model_program.SetUniform("model", model_matrix);
+    model_program.SetUniform("projection", camera.ProjectionMatrix());
+    model.Draw(model_program);
 
     glfwSwapBuffers(window);  // 交换颜色缓冲
     glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）

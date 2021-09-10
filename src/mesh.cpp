@@ -9,18 +9,12 @@
 #include "glad/glad.h"
 
 Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices,
-           const std::vector<Texture> &textures)
+           const std::vector<std::shared_ptr<Texture>> &textures)
     : vertices_(vertices), indices_(indices), textures_(textures) {
   Setup();
 }
 
 Mesh::~Mesh() {
-  // 解绑对象
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindVertexArray(0);
-
-  // 释放对象
   glDeleteVertexArrays(1, &vertex_array_object_);
   glDeleteBuffers(1, &vertex_buffer_object_);
   glDeleteBuffers(1, &element_buffer_object_);
@@ -31,27 +25,24 @@ void Mesh::Draw(const Program &program) const {
   auto specular_cnt = 1;
 
   for (auto i = 0; i < textures_.size(); ++i) {
-    const auto type = textures_[i].Type();
+    const auto type = textures_[i]->Type();
     std::string name;
-    std::string number;
     if (type == Texture::Type::kDiffuseMapping) {
-      name = "texture_diffuse";
-      number = std::to_string(diffuse_cnt++);
+      name = "texture_diffuse" + std::to_string(diffuse_cnt++);
     } else if (type == Texture::Type::kSpecularMapping) {
-      name = "texture_specular";
-      number = std::to_string(specular_cnt++);
+      name = "texture_specular" + std::to_string(specular_cnt++);
     }
 
-    glActiveTexture(GL_TEXTURE0 + i);
-    program.SetUniform("material." + name + number, i);
-    textures_[i].Bind();
+    program.SetUniform("material." + name, static_cast<int>(textures_[i]->Id()));
+    glActiveTexture(GL_TEXTURE0 + textures_[i]->Id());
+    textures_[i]->Bind();
   }
 
   glActiveTexture(GL_TEXTURE0);
 
   // 绘制
   glBindVertexArray(vertex_array_object_);
-  glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
+  glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 

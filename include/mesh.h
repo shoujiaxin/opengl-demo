@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include "glm/glm.hpp"
@@ -11,9 +12,6 @@
 #include "texture.h"
 
 struct Vertex {
-  Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& texture_coordinates)
-      : position_(position), normal_(normal), texture_coordinates_(texture_coordinates) {}
-
   // 法向量
   glm::vec3 normal_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -27,7 +25,7 @@ struct Vertex {
 class Mesh {
  public:
   Mesh(const std::vector<Vertex>& vertices, const std::vector<unsigned int>& indices,
-       const std::vector<Texture>& textures);
+       const std::vector<std::shared_ptr<Texture>>& textures);
 
   ~Mesh();
 
@@ -43,7 +41,7 @@ class Mesh {
   std::vector<unsigned int> indices_ = {};
 
   // 纹理
-  std::vector<Texture> textures_ = {};
+  std::vector<std::shared_ptr<Texture>> textures_ = {};
 
   // 顶点
   std::vector<Vertex> vertices_ = {};

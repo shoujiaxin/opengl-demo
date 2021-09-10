@@ -19,6 +19,8 @@ class Texture {
   // 绑定纹理
   void Bind() const;
 
+  unsigned int Id() const;
+
   // 设置过滤方式
   void SetFiltering(int operation, int method) const;
 

@@ -12,11 +12,11 @@
 #include "stb_image.h"
 
 Texture::Texture(const std::string &path, enum Type type) : type_(type) {
-  int channels;
+  auto channels = 0;
   stbi_set_flip_vertically_on_load(true);
   const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
   if (data == nullptr) {
-    std::cerr << "Failed to load texture" << std::endl;
+    std::cerr << "Failed to load texture: " << path << std::endl;
     return;
   }
 
@@ -36,6 +36,8 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
 Texture::~Texture() { glDeleteTextures(1, &id_); }
 
 void Texture::Bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
+
+unsigned int Texture::Id() const { return id_; }
 
 void Texture::SetFiltering(int operation, int method) const {
   glTexParameteri(GL_TEXTURE_2D, operation, method);
