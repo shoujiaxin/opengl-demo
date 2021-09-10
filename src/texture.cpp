@@ -11,7 +11,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture::Texture(const std::string &path) {
+Texture::Texture(const std::string &path, enum Type type) : type_(type) {
   int channels;
   stbi_set_flip_vertically_on_load(true);
   const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
@@ -40,6 +40,8 @@ void Texture::Bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
 void Texture::SetFiltering(int operation, int method) const {
   glTexParameteri(GL_TEXTURE_2D, operation, method);
 }
+
+void Texture::SetType(enum Type value) { type_ = value; }
 
 void Texture::SetWrap(int axis, int mode) const { glTexParameteri(GL_TEXTURE_2D, axis, mode); }
 

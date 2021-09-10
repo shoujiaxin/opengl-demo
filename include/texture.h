@@ -10,7 +10,9 @@ class Texture {
  public:
   enum class Type { kDefault, kDiffuseMapping, kSpecularMapping };
 
-  explicit Texture(const std::string& path);
+  Texture() = default;
+
+  explicit Texture(const std::string& path, Type type = Type::kDefault);
 
   ~Texture();
 
@@ -19,6 +21,8 @@ class Texture {
 
   // 设置过滤方式
   void SetFiltering(int operation, int method) const;
+
+  void SetType(Type value);
 
   // 设置环绕方式
   void SetWrap(int axis, int mode) const;

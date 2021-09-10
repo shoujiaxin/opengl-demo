@@ -26,7 +26,7 @@ Mesh::~Mesh() {
   glDeleteBuffers(1, &element_buffer_object_);
 }
 
-void Mesh::Draw(const Program &program) {
+void Mesh::Draw(const Program &program) const {
   auto diffuse_cnt = 1;
   auto specular_cnt = 1;
 

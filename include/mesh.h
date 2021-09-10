@@ -11,6 +11,9 @@
 #include "texture.h"
 
 struct Vertex {
+  Vertex(const glm::vec3& position, const glm::vec3& normal, const glm::vec2& texture_coordinates)
+      : position_(position), normal_(normal), texture_coordinates_(texture_coordinates) {}
+
   // 法向量
   glm::vec3 normal_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -28,7 +31,7 @@ class Mesh {
 
   ~Mesh();
 
-  void Draw(const Program& program);
+  void Draw(const Program& program) const;
 
  private:
   void Setup();
