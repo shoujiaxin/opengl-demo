@@ -72,7 +72,7 @@ void Controls::OnMouseMove(double x, double y) {
   const auto offset_x = sensitivity * (x - last_cursor_position_.x);
   const auto offset_y = sensitivity * (last_cursor_position_.y - y);
   camera_yaw_ += offset_x;
-  camera_pitch_ += offset_y;
+  camera_pitch_ = std::clamp(camera_pitch_ + static_cast<float>(offset_y), -80.0f, 80.0f);
 
   auto target = glm::vec3(0.0f, 0.0f, 0.0f);
   target.x = cos(glm::radians(camera_yaw_)) * cos(glm::radians(camera_pitch_));
