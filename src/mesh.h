@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "glm/glm.hpp"
-#include "program.h"
+#include "shaders.h"
 #include "texture.h"
 
 struct Vertex {

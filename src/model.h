@@ -11,7 +11,7 @@
 
 #include "assimp/scene.h"
 #include "mesh.h"
-#include "program.h"
+#include "shaders.h"
 
 class Model {
  public:

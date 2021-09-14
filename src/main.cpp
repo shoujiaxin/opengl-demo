@@ -12,8 +12,7 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "lights.h"
 #include "model.h"
-#include "program.h"
-#include "shader.h"
+#include "shaders.h"
 #include "texture.h"
 
 #define SCR_WIDTH 1200

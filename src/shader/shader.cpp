@@ -38,13 +38,3 @@ std::string Shader::LoadSourceFrom(const std::string &path) {
   stream << file.rdbuf();
   return stream.str();
 }
-
-VertexShader::VertexShader(const std::string &path) {
-  id_ = glCreateShader(GL_VERTEX_SHADER);
-  Compile(LoadSourceFrom(path));
-}
-
-FragmentShader::FragmentShader(const std::string &path) {
-  id_ = glCreateShader(GL_FRAGMENT_SHADER);
-  Compile(LoadSourceFrom(path));
-}
