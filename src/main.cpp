@@ -2,6 +2,7 @@
 #include "glad/glad.h"
 #include "GLFW/glfw3.h"
 // clang-format on
+
 #include <cmath>
 #include <iostream>
 #include <random>
@@ -137,16 +138,20 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
   glEnableVertexAttribArray(0);
   // 颜色属性
-  //  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-  //  glEnableVertexAttribArray(1);
+  //    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+  //                          reinterpret_cast<void*>(3 * sizeof(float)));
+  //    glEnableVertexAttribArray(1);
   // 纹理属性
-  //  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
-  //  glEnableVertexAttribArray(2);
+  //    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
+  //                          reinterpret_cast<void*>(3 * sizeof(float)));
+  //    glEnableVertexAttribArray(2);
   // 法向量属性
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, (void*)(3 * sizeof(float)));
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(3 * sizeof(float)));
   glEnableVertexAttribArray(1);
   // 光照贴图纹理坐标属性
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, (void*)(6 * sizeof(float)));
+  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
+                        reinterpret_cast<void*>(6 * sizeof(float)));
   glEnableVertexAttribArray(2);
 
   // 解绑顶点数组对象
@@ -217,7 +222,7 @@ int main() {
     // 输入
     HandleKeyboardInput(window);
 
-    // 清除颜色缓冲
+    // 清除缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -305,8 +310,11 @@ int main() {
     model_program.SetUniform("projection", camera.ProjectionMatrix());
     model.Draw(model_program);
 
-    glfwSwapBuffers(window);  // 交换颜色缓冲
-    glfwPollEvents();         // 检查触发事件（键盘输入、鼠标移动等）
+    // 交换颜色缓冲
+    glfwSwapBuffers(window);
+
+    // 检查触发事件（键盘输入、鼠标移动等）
+    glfwPollEvents();
   }
 
   glDeleteVertexArrays(1, &vertex_array_object);

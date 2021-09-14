@@ -26,10 +26,15 @@ include_directories(third_party/assimp/include)
 include_directories(include)
 
 file(GLOB SOURCE_FILES
-        src/*.cpp
+        src/controls.cpp
+        src/mesh.cpp
+        src/model.cpp
+        src/texture.cpp
         src/*/*.cpp
         )
 
-add_executable(Demo ${SOURCE_FILES})
-
+add_executable(Demo src/main.cpp ${SOURCE_FILES})
 target_link_libraries(Demo glfw glad assimp)
+
+add_executable(DepthTesting src/depth_testing.cpp ${SOURCE_FILES})
+target_link_libraries(DepthTesting glfw glad assimp)

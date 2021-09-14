@@ -25,7 +25,20 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
   // 绑定纹理
   Bind();
   // 生成纹理
-  const auto format = (path.substr(path.size() - 4, 4) == ".png") ? GL_RGBA : GL_RGB;
+  auto format = GL_RGB;
+  switch (channels) {
+    case 1:
+      format = GL_RED;
+      break;
+    case 3:
+      format = GL_RGB;
+      break;
+    case 4:
+      format = GL_RGBA;
+      break;
+    default:
+      break;
+  }
   glTexImage2D(GL_TEXTURE_2D, 0, format, width_, height_, 0, format, GL_UNSIGNED_BYTE, data);
   // 生成多级渐远纹理
   glGenerateMipmap(GL_TEXTURE_2D);
