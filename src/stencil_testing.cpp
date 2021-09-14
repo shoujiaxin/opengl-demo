@@ -57,8 +57,15 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
+  // 开启模板测试
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_NOTEQUAL, 1, 0xff);
+  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
   const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
                                FragmentShader("../shader/fragment_shader/depth_testing.frag"));
+  const auto outline_program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
+                                       FragmentShader("../shader/fragment_shader/light.frag"));
 
   float cube_vertices[] = {
       // ----- 位置 -----, --- 纹理坐标 ---
@@ -163,7 +170,7 @@ int main() {
 
     // 清除缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     controls.Update();
 
@@ -171,7 +178,24 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
 
+    outline_program.Use();
+    outline_program.SetUniform("view", camera.ViewMatrix());
+    outline_program.SetUniform("projection", camera.ProjectionMatrix());
+
     auto model_matrix = glm::mat4(1.0f);
+
+    glStencilMask(0x00);
+    program.Use();
+
+    // 绘制平面
+    glBindVertexArray(plane_vao);
+    floor_texture.Bind();
+    program.SetUniform("model", glm::mat4(1.0f));
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+
+    glStencilFunc(GL_ALWAYS, 1, 0xff);
+    glStencilMask(0xff);
 
     // 绘制立方体
     glBindVertexArray(cube_vao);
@@ -186,12 +210,31 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
-    // 绘制平面
-    glBindVertexArray(plane_vao);
-    floor_texture.Bind();
-    program.SetUniform("model", glm::mat4(1.0f));
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xff);
+    glStencilMask(0x00);  // 禁用写入模板缓冲
+    glDisable(GL_DEPTH_TEST);
+    outline_program.Use();
+    constexpr auto scale = 1.1f;
+
+    // 绘制轮廓
+    glBindVertexArray(cube_vao);
+    glActiveTexture(GL_TEXTURE0);
+    cube_texture.Bind();
+    model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, glm::vec3(-1.0f, 0.001f, -1.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(scale, scale, scale));
+    program.SetUniform("model", model_matrix);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, 0.001f, 0.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(scale, scale, scale));
+    program.SetUniform("model", model_matrix);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+
+    glStencilMask(0xff);
+    glStencilFunc(GL_ALWAYS, 0, 0xff);
+    glEnable(GL_DEPTH_TEST);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);

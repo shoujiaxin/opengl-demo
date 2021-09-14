@@ -38,3 +38,6 @@ target_link_libraries(Demo glfw glad assimp)
 
 add_executable(DepthTesting src/depth_testing.cpp ${SOURCE_FILES})
 target_link_libraries(DepthTesting glfw glad assimp)
+
+add_executable(StencilTesting src/stencil_testing.cpp ${SOURCE_FILES})
+target_link_libraries(StencilTesting glfw glad assimp)
