@@ -57,62 +57,68 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
+  // 开启面剔除
+  glEnable(GL_CULL_FACE);
+  //  glCullFace(GL_FRONT);  // 需要剔除的面
+  //  glFrontFace(GL_CW);    // 需要剔除面的方向
+
   const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
                                FragmentShader("../shader/fragment_shader/depth_testing.frag"));
 
   float cube_vertices[] = {
       // ----- 位置 -----, --- 纹理坐标 ---
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  //
-      0.5f,  -0.5f, -0.5f, 1.0f, 0.0f,  //
-      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,  //
-      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,  //
-      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f,  //
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  //
-
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,  //
-      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,  //
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  //
-      0.5f,  0.5f,  0.5f,  1.0f, 1.0f,  //
-      -0.5f, 0.5f,  0.5f,  0.0f, 1.0f,  //
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,  //
-
-      -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,  //
-      -0.5f, 0.5f,  -0.5f, 1.0f, 1.0f,  //
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,  //
-      -0.5f, 0.5f,  0.5f,  1.0f, 0.0f,  //
-
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  //
-      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,  //
-      0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,  //
-      0.5f,  -0.5f, -0.5f, 0.0f, 1.0f,  //
-      0.5f,  -0.5f, 0.5f,  0.0f, 0.0f,  //
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  //
-
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
-      0.5f,  -0.5f, -0.5f, 1.0f, 1.0f,  //
-      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,  //
-      0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,  //
-      -0.5f, -0.5f, 0.5f,  0.0f, 0.0f,  //
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
-
-      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f,  //
-      0.5f,  0.5f,  -0.5f, 1.0f, 1.0f,  //
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  //
-      0.5f,  0.5f,  0.5f,  1.0f, 0.0f,  //
-      -0.5f, 0.5f,  0.5f,  0.0f, 0.0f,  //
-      -0.5f, 0.5f,  -0.5f, 0.0f, 1.0f   //
+      // Back face
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom-left
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f,   // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom-left
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top-left
+      // Front face
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom-right
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   // top-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
+      // Left face
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
+      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-left
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
+      // Right face
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
+      0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-left
+      // Bottom face
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
+      0.5f, -0.5f, -0.5f, 1.0f, 1.0f,   // top-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
+      // Top face
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
+      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f    // bottom-left
   };
   float plane_vertices[] = {
       // ----- 位置 -----, --- 纹理坐标 ---
       5.0f,  -0.5f, 5.0f,  2.0f, 0.0f,  //
-      -5.0f, -0.5f, 5.0f,  0.0f, 0.0f,  //
       -5.0f, -0.5f, -5.0f, 0.0f, 2.0f,  //
+      -5.0f, -0.5f, 5.0f,  0.0f, 0.0f,  //
 
       5.0f,  -0.5f, 5.0f,  2.0f, 0.0f,  //
-      -5.0f, -0.5f, -5.0f, 0.0f, 2.0f,  //
-      5.0f,  -0.5f, -5.0f, 2.0f, 2.0f   //
+      5.0f,  -0.5f, -5.0f, 2.0f, 2.0f,  //
+      -5.0f, -0.5f, -5.0f, 0.0f, 2.0f   //
   };
 
   // 立方体
