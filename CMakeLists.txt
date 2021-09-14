@@ -27,8 +27,10 @@ include_directories(include)
 
 file(GLOB SOURCE_FILES
         src/controls.cpp
+        src/framebuffer.cpp
         src/mesh.cpp
         src/model.cpp
+        src/renderbuffer.cpp
         src/texture.cpp
         src/*/*.cpp
         )

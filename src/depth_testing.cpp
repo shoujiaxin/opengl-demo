@@ -7,6 +7,7 @@
 
 #include "cameras.h"
 #include "controls.h"
+#include "framebuffer.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "shaders.h"
 #include "texture.h"
@@ -64,6 +65,8 @@ int main() {
 
   const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
                                FragmentShader("../shader/fragment_shader/depth_testing.frag"));
+  const auto screen_program = Program(VertexShader("../shader/vertex_shader/framebuffer.vert"),
+                                      FragmentShader("../shader/fragment_shader/framebuffer.frag"));
 
   float cube_vertices[] = {
       // ----- 位置 -----, --- 纹理坐标 ---
@@ -120,6 +123,35 @@ int main() {
       5.0f,  -0.5f, -5.0f, 2.0f, 2.0f,  //
       -5.0f, -0.5f, -5.0f, 0.0f, 2.0f   //
   };
+  float quad_vertices[] = {
+      // -- 位置 --, -- 纹理坐标 --
+      -1.0f, 1.0f,  0.0f, 1.0f,  //
+      -1.0f, -1.0f, 0.0f, 0.0f,  //
+      1.0f,  -1.0f, 1.0f, 0.0f,  //
+
+      -1.0f, 1.0f,  0.0f, 1.0f,  //
+      1.0f,  -1.0f, 1.0f, 0.0f,  //
+      1.0f,  1.0f,  1.0f, 1.0f   //
+  };
+
+  // 帧缓冲
+  const auto framebuffer = Framebuffer();
+  framebuffer.Bind();
+  // 生成纹理，作为颜色附件（Retina 屏幕，长宽需 x2）
+  const auto texture_color_buffer = Texture(2 * SCR_WIDTH, 2 * SCR_HEIGHT);
+  texture_color_buffer.SetFiltering(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  texture_color_buffer.SetFiltering(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  framebuffer.Attach(texture_color_buffer);
+  // 生成渲染缓冲对象，作为深度（和模板）附件（Retina 屏幕，长宽需 x2）
+  const auto render_buffer = Renderbuffer(2 * SCR_WIDTH, 2 * SCR_HEIGHT);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  framebuffer.Attach(render_buffer);
+  // 检查帧缓冲是否完整
+  if (!framebuffer.IsComplete()) {
+    std::cerr << "Framebuffer is not complete!" << std::endl;
+  }
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // 立方体
   unsigned int cube_vao, cube_vbo;
@@ -149,13 +181,29 @@ int main() {
                         reinterpret_cast<void*>(3 * sizeof(float)));
   glBindVertexArray(0);
 
-  const auto cube_texture = Texture("../resource/texture/marble.jpg");
+  // 屏幕矩形
+  unsigned int quad_vao, quad_vbo;
+  glGenVertexArrays(1, &quad_vao);
+  glGenBuffers(1, &quad_vbo);
+  glBindVertexArray(quad_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float),
+                        reinterpret_cast<void*>(2 * sizeof(float)));
+  glBindVertexArray(0);
+
+  const auto cube_texture = Texture("../resource/texture/container.jpg");
   const auto floor_texture = Texture("../resource/texture/metal.png");
   floor_texture.SetWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
   floor_texture.SetWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
 
   program.Use();
   program.SetUniform("texture1", 0);
+  screen_program.Use();
+  screen_program.SetUniform("screenTexture", 0);
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -166,6 +214,9 @@ int main() {
   while (!glfwWindowShouldClose(window)) {
     // 输入
     HandleKeyboardInput(window);
+
+    framebuffer.Bind();
+    glEnable(GL_DEPTH_TEST);
 
     // 清除缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
@@ -199,6 +250,18 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
+    // 使用默认帧缓冲
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDisable(GL_DEPTH_TEST);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // 绘制帧缓冲
+    screen_program.Use();
+    glBindVertexArray(quad_vao);
+    texture_color_buffer.Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
     // 交换颜色缓冲
     glfwSwapBuffers(window);
 
@@ -210,6 +273,8 @@ int main() {
   glDeleteBuffers(1, &cube_vbo);
   glDeleteVertexArrays(1, &plane_vao);
   glDeleteBuffers(1, &plane_vbo);
+  glDeleteVertexArrays(1, &quad_vao);
+  glDeleteBuffers(1, &quad_vbo);
 
   glfwTerminate();
   return 0;

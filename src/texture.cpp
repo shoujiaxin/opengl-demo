@@ -46,18 +46,50 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
   stbi_image_free(data);
 }
 
+Texture::Texture(int width, int height, enum Format format)
+    : format_(format), height_(height), width_(width) {
+  glGenTextures(1, &id_);
+  Bind();
+
+  switch (format) {
+    case Format::kDefault:
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+      break;
+    case Format::kDepthComponent:
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT,
+                   GL_UNSIGNED_BYTE, nullptr);
+      break;
+    case Format::kDepthStencil:
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
+                   GL_UNSIGNED_INT_24_8, NULL);
+      break;
+    case Format::kStencilIndex:
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_INDEX,
+                   GL_UNSIGNED_BYTE, nullptr);
+      break;
+    default:
+      assert(false);
+  }
+}
+
 Texture::~Texture() { glDeleteTextures(1, &id_); }
 
 void Texture::Bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
 
+enum Texture::Format Texture::Format() const { return format_; }
+
 unsigned int Texture::Id() const { return id_; }
 
 void Texture::SetFiltering(int operation, int method) const {
+  Bind();
   glTexParameteri(GL_TEXTURE_2D, operation, method);
 }
 
 void Texture::SetType(enum Type value) { type_ = value; }
 
-void Texture::SetWrap(int axis, int mode) const { glTexParameteri(GL_TEXTURE_2D, axis, mode); }
+void Texture::SetWrap(int axis, int mode) const {
+  Bind();
+  glTexParameteri(GL_TEXTURE_2D, axis, mode);
+}
 
 enum Texture::Type Texture::Type() const { return type_; }
