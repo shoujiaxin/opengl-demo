@@ -3,7 +3,9 @@
 #include "GLFW/glfw3.h"
 // clang-format on
 
+#include <algorithm>
 #include <iostream>
+#include <vector>
 
 #include "cameras.h"
 #include "controls.h"
@@ -57,15 +59,12 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  // 开启模板测试
-  glEnable(GL_STENCIL_TEST);
-  glStencilFunc(GL_NOTEQUAL, 1, 0xff);
-  glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+  // 开启混合
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
-                               FragmentShader("../shader/fragment_shader/depth_testing.frag"));
-  const auto outline_program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
-                                       FragmentShader("../shader/fragment_shader/light.frag"));
+                               FragmentShader("../shader/fragment_shader/blending.frag"));
 
   float cube_vertices[] = {
       // ----- 位置 -----, --- 纹理坐标 ---
@@ -121,6 +120,21 @@ int main() {
       -5.0f, -0.5f, -5.0f, 0.0f, 2.0f,  //
       5.0f,  -0.5f, -5.0f, 2.0f, 2.0f   //
   };
+  float transparent_vertices[] = {
+      // ---- 位置 ----, --- 纹理坐标 ---
+      0.0f, 0.5f,  0.0f, 0.0f, 1.0f,  //
+      0.0f, -0.5f, 0.0f, 0.0f, 0.0f,  //
+      1.0f, -0.5f, 0.0f, 1.0f, 0.0f,  //
+
+      0.0f, 0.5f,  0.0f, 0.0f, 1.0f,  //
+      1.0f, -0.5f, 0.0f, 1.0f, 0.0f,  //
+      1.0f, 0.5f,  0.0f, 1.0f, 1.0f   //
+  };
+  auto vegetation_positions = std::vector<glm::vec3>{{-1.5f, 0.0f, -0.48f},
+                                                     {1.5f, 0.0f, 0.51f},
+                                                     {0.0f, 0.0f, 0.7f},
+                                                     {-0.3f, 0.0f, -2.3f},
+                                                     {0.5f, 0.0f, -0.6f}};
 
   // 立方体
   unsigned int cube_vao, cube_vbo;
@@ -128,7 +142,7 @@ int main() {
   glGenBuffers(1, &cube_vbo);
   glBindVertexArray(cube_vao);
   glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), &cube_vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -142,7 +156,21 @@ int main() {
   glGenBuffers(1, &plane_vbo);
   glBindVertexArray(plane_vao);
   glBindBuffer(GL_ARRAY_BUFFER, plane_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), plane_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), &plane_vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        reinterpret_cast<void*>(3 * sizeof(float)));
+  glBindVertexArray(0);
+
+  // 透明纹理
+  unsigned int vegetation_vao, vegetation_vbo;
+  glGenVertexArrays(1, &vegetation_vao);
+  glGenBuffers(1, &vegetation_vbo);
+  glBindVertexArray(vegetation_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, vegetation_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(transparent_vertices), transparent_vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -154,6 +182,9 @@ int main() {
   const auto floor_texture = Texture("../resource/texture/metal.png");
   floor_texture.SetWrap(GL_TEXTURE_WRAP_S, GL_REPEAT);
   floor_texture.SetWrap(GL_TEXTURE_WRAP_T, GL_REPEAT);
+  const auto grass_texture = Texture("../resource/texture/window.png");
+  grass_texture.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  grass_texture.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
   program.Use();
   program.SetUniform("texture1", 0);
@@ -170,7 +201,7 @@ int main() {
 
     // 清除缓冲
     glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     controls.Update();
 
@@ -178,24 +209,7 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
 
-    outline_program.Use();
-    outline_program.SetUniform("view", camera.ViewMatrix());
-    outline_program.SetUniform("projection", camera.ProjectionMatrix());
-
     auto model_matrix = glm::mat4(1.0f);
-
-    glStencilMask(0x00);
-    program.Use();
-
-    // 绘制平面
-    glBindVertexArray(plane_vao);
-    floor_texture.Bind();
-    program.SetUniform("model", glm::mat4(1.0f));
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-
-    glStencilFunc(GL_ALWAYS, 1, 0xff);
-    glStencilMask(0xff);
 
     // 绘制立方体
     glBindVertexArray(cube_vao);
@@ -210,31 +224,28 @@ int main() {
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
 
-    glStencilFunc(GL_NOTEQUAL, 1, 0xff);
-    glStencilMask(0x00);  // 禁用写入模板缓冲
-    glDisable(GL_DEPTH_TEST);
-    outline_program.Use();
-    constexpr auto scale = 1.1f;
-
-    // 绘制轮廓
-    glBindVertexArray(cube_vao);
-    glActiveTexture(GL_TEXTURE0);
-    cube_texture.Bind();
-    model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(-1.0f, 0.001f, -1.0f));
-    model_matrix = glm::scale(model_matrix, glm::vec3(scale, scale, scale));
-    program.SetUniform("model", model_matrix);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, 0.001f, 0.0f));
-    model_matrix = glm::scale(model_matrix, glm::vec3(scale, scale, scale));
-    program.SetUniform("model", model_matrix);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // 绘制平面
+    glBindVertexArray(plane_vao);
+    floor_texture.Bind();
+    program.SetUniform("model", glm::mat4(1.0f));
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 
-    glStencilMask(0xff);
-    glStencilFunc(GL_ALWAYS, 0, 0xff);
-    glEnable(GL_DEPTH_TEST);
+    // 排序透明物体，先绘制最远的
+    std::sort(vegetation_positions.begin(), vegetation_positions.end(),
+              [&](const auto& lhs, const auto& rhs) {
+                return glm::length(camera.Position() - lhs) > glm::length(camera.Position() - rhs);
+              });
+
+    // 绘制透明纹理
+    glBindVertexArray(vegetation_vao);
+    grass_texture.Bind();
+    for (const auto& position : vegetation_positions) {
+      model_matrix = glm::mat4(1.0f);
+      model_matrix = glm::translate(model_matrix, position);
+      program.SetUniform("model", model_matrix);
+      glDrawArrays(GL_TRIANGLES, 0, 6);
+    }
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);

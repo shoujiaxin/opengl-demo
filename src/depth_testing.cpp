@@ -121,7 +121,7 @@ int main() {
   glGenBuffers(1, &cube_vbo);
   glBindVertexArray(cube_vao);
   glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), &cube_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -135,7 +135,7 @@ int main() {
   glGenBuffers(1, &plane_vbo);
   glBindVertexArray(plane_vao);
   glBindBuffer(GL_ARRAY_BUFFER, plane_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), &plane_vertices, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), plane_vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
