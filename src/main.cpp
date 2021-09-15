@@ -164,10 +164,10 @@ int main() {
   program.SetUniform("material.shininess", 32.0f);
 
   // 加载光照贴图
-  program.SetUniform("material.diffuse", 0);
+  program.SetUniform("material.texture_diffuse1", 0);
   glActiveTexture(GL_TEXTURE0);
   const auto diffuse_map = Texture("../resource/lighting_map/container2.png");
-  program.SetUniform("material.specular", 1);
+  program.SetUniform("material.texture_specular1", 1);
   glActiveTexture(GL_TEXTURE1);
   const auto specular_map = Texture("../resource/lighting_map/container2_specular.png");
   //  program.SetUniform("material.emission", 2);
@@ -185,23 +185,20 @@ int main() {
   const auto light_cube_program = Program(VertexShader("../shader/vertex_shader/lighting.vert"),
                                           FragmentShader("../shader/fragment_shader/light.frag"));
   const auto ambient_light = AmbientLight(Color::kWhite, 0.2f);
-  const auto sunlight = DirectionalLight(Color::kRed, 0.8f);
+  const auto sunlight = DirectionalLight(Color::kWhite, 0.2f);
   std::vector<PointLight> point_lights = {};
   point_lights.reserve(point_light_positions.size());
   for (const auto& position : point_light_positions) {
-    auto light = PointLight(Color::kGreen, 0.4f);
+    auto light = PointLight(Color::kWhite, 0.2f);
     light.SetPosition(position);
     light.SetAttenuation({1.0f, 0.09f, 0.032f});
     point_lights.push_back(light);
   }
-  auto spotlight = Spotlight(Color::kWhite, 2.0f);
+  auto spotlight = Spotlight(Color::kWhite, 1.5f);
   spotlight.SetCutOff({cos(glm::radians(15.0f)), cos(glm::radians(20.0f))});
   spotlight.SetAttenuation({1.0f, 0.09f, 0.032f});
 
   // 模型
-  const auto model_program = Program(VertexShader("../shader/vertex_shader/model.vert"),
-                                     FragmentShader("../shader/fragment_shader/model.frag"));
-  model_program.Use();
   const auto model = Model("../resource/model/nanosuit/nanosuit.obj");
 
   // 线框模式
@@ -287,9 +284,6 @@ int main() {
 
     // 绘制图形
     glBindVertexArray(vertex_array_object);
-    //    glDrawArrays(GL_TRIANGLES, 0, 3);  // 三角形
-    //    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);  // 矩形
-    //    glDrawArrays(GL_TRIANGLES, 0, 36);  // 立方体
     std::default_random_engine e;
     std::uniform_int_distribution<unsigned> u(0, cube_positions.size());
     for (const auto& position : cube_positions) {
@@ -298,23 +292,21 @@ int main() {
       model_matrix =
           glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
       program.SetUniform("model", model_matrix);
+      program.SetUniform("material.texture_diffuse1", 0);
       glActiveTexture(GL_TEXTURE0);
       diffuse_map.Bind();
+      program.SetUniform("material.texture_specular1", 1);
       glActiveTexture(GL_TEXTURE1);
       specular_map.Bind();
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
     glBindVertexArray(0);
-    //    program.SetUniform("model", glm::mat4(1.0f));
-    //    glDrawArrays(GL_TRIANGLES, 0, 36);
 
-    model_program.Use();
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
-    model_program.SetUniform("view", camera.ViewMatrix());
-    model_program.SetUniform("model", model_matrix);
-    model_program.SetUniform("projection", camera.ProjectionMatrix());
-    model.Draw(model_program);
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, 0.0f, 10.0f));
+    program.SetUniform("model", model_matrix);
+    model.Draw(program);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);
