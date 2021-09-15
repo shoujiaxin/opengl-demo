@@ -9,5 +9,6 @@ uniform mat4 projection;
 
 void main() {
     TexCoords = aPos;
-    gl_Position = projection * view * vec4(aPos, 1.0);
+    vec4 pos = projection * view * vec4(aPos, 1.0);
+    gl_Position = pos.xyww;// 使天空盒的深度 z 始终为最大值 1.0
 }

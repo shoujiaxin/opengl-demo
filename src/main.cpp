@@ -244,6 +244,7 @@ int main() {
       light_cube_program.SetUniform("model", model_matrix);
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    glBindVertexArray(0);
 
     // 激活着色器程序
     program.Use();
@@ -297,8 +298,13 @@ int main() {
       model_matrix =
           glm::rotate(model_matrix, glm::radians(20.0f * u(e)), glm::vec3(1.0f, 0.3f, 0.5f));
       program.SetUniform("model", model_matrix);
+      glActiveTexture(GL_TEXTURE0);
+      diffuse_map.Bind();
+      glActiveTexture(GL_TEXTURE1);
+      specular_map.Bind();
       glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    glBindVertexArray(0);
     //    program.SetUniform("model", glm::mat4(1.0f));
     //    glDrawArrays(GL_TRIANGLES, 0, 36);
 
@@ -320,6 +326,8 @@ int main() {
   glDeleteVertexArrays(1, &vertex_array_object);
   glDeleteBuffers(1, &vertex_buffer_object);
   glDeleteBuffers(1, &element_buffer_object);
+
+  glDeleteVertexArrays(1, &light_vertex_array_object);
 
   glfwTerminate();
   return 0;

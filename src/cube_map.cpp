@@ -54,7 +54,7 @@ int main() {
 
   // 开启深度测试
   glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
+  glDepthFunc(GL_LEQUAL);
 
   // 开启面剔除
   glEnable(GL_CULL_FACE);
