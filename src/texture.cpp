@@ -72,9 +72,57 @@ Texture::Texture(int width, int height, enum Format format)
   }
 }
 
+Texture::Texture(const std::vector<std::string> &paths) {
+  glGenTextures(1, &id_);
+  Bind();
+
+  auto channels = 0;
+  //  stbi_set_flip_vertically_on_load(true);
+  for (auto i = 0; i < paths.size(); ++i) {
+    const auto &path = paths[i];
+    const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
+    if (data == nullptr) {
+      std::cerr << "Failed to load texture: " << path << std::endl;
+      return;
+    }
+
+    auto format = GL_RGB;
+    switch (channels) {
+      case 1:
+        format = GL_RED;
+        break;
+      case 3:
+        format = GL_RGB;
+        break;
+      case 4:
+        format = GL_RGBA;
+        break;
+      default:
+        break;
+    }
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, format, width_, height_, 0, format,
+                 GL_UNSIGNED_BYTE, data);
+
+    stbi_image_free(data);
+  }
+
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
 Texture::~Texture() { glDeleteTextures(1, &id_); }
 
-void Texture::Bind() const { glBindTexture(GL_TEXTURE_2D, id_); }
+void Texture::Bind() const {
+  if (type_ == Type::kCubeMap) {
+    glBindTexture(GL_TEXTURE_CUBE_MAP, id_);
+  } else {
+    glBindTexture(GL_TEXTURE_2D, id_);
+  }
+}
 
 enum Texture::Format Texture::Format() const { return format_; }
 
@@ -82,14 +130,22 @@ unsigned int Texture::Id() const { return id_; }
 
 void Texture::SetFiltering(int operation, int method) const {
   Bind();
-  glTexParameteri(GL_TEXTURE_2D, operation, method);
+  if (type_ == Type::kCubeMap) {
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, operation, method);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, operation, method);
+  }
 }
 
 void Texture::SetType(enum Type value) { type_ = value; }
 
 void Texture::SetWrap(int axis, int mode) const {
   Bind();
-  glTexParameteri(GL_TEXTURE_2D, axis, mode);
+  if (type_ == Type::kCubeMap) {
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, axis, mode);
+  } else {
+    glTexParameteri(GL_TEXTURE_2D, axis, mode);
+  }
 }
 
 enum Texture::Type Texture::Type() const { return type_; }

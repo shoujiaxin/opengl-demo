@@ -27,9 +27,9 @@ void Mesh::Draw(const Program &program) const {
   for (auto i = 0; i < textures_.size(); ++i) {
     const auto type = textures_[i]->Type();
     std::string name;
-    if (type == Texture::Type::kDiffuseMapping) {
+    if (type == Texture::Type::kDiffuseMap) {
       name = "texture_diffuse" + std::to_string(diffuse_cnt++);
-    } else if (type == Texture::Type::kSpecularMapping) {
+    } else if (type == Texture::Type::kSpecularMap) {
       name = "texture_specular" + std::to_string(specular_cnt++);
     }
 

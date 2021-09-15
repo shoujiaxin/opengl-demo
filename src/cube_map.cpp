@@ -1,0 +1,227 @@
+// clang-format off
+#include "glad/glad.h"
+#include "GLFW/glfw3.h"
+// clang-format on
+
+#include <iostream>
+
+#include "cameras.h"
+#include "controls.h"
+#include "shaders.h"
+#include "texture.h"
+
+#define SCR_WIDTH 1200
+#define SCR_HEIGHT 800
+
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+  glViewport(0, 0, width, height);
+}
+
+void HandleKeyboardInput(GLFWwindow* window) {
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+    glfwSetWindowShouldClose(window, true);
+    return;
+  }
+}
+
+int main() {
+  // 初始化 GLFW
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+#ifdef __APPLE__
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+  // 创建窗口
+  const auto window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Demo", nullptr, nullptr);
+  if (window == nullptr) {
+    std::cerr << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
+  // 捕捉并隐藏光标
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+  // 初始化 GLAD
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cerr << "Failed to initialize GLAD" << std::endl;
+    return -1;
+  }
+
+  // 开启深度测试
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+
+  // 开启面剔除
+  glEnable(GL_CULL_FACE);
+  //  glCullFace(GL_FRONT);  // 需要剔除的面
+  //  glFrontFace(GL_CW);    // 需要剔除面的方向
+
+  // 加载天空盒
+  const auto skybox_texture = Texture({
+      // 按照枚举顺序
+      "../resource/texture/skybox/right.jpg",   //
+      "../resource/texture/skybox/left.jpg",    //
+      "../resource/texture/skybox/top.jpg",     //
+      "../resource/texture/skybox/bottom.jpg",  //
+      "../resource/texture/skybox/front.jpg",   //
+      "../resource/texture/skybox/back.jpg"     //
+  });
+  const auto cube_texture = Texture("../resource/texture/container.jpg");
+
+  // 天空盒顶点
+  const float skybox_vertices[] = {-1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+                                   1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+                                   -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+                                   -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+                                   1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+                                   1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+                                   -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+                                   1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+                                   -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+                                   1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+                                   -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+                                   1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+
+  float cube_vertices[] = {
+      // ----- 位置 -----, --- 纹理坐标 ---
+      // Back face
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom-left
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
+      0.5f, -0.5f, -0.5f, 1.0f, 0.0f,   // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
+      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom-left
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top-left
+      // Front face
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom-right
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
+      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
+      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   // top-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
+      // Left face
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
+      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-left
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
+      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
+      // Right face
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
+      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
+      0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-left
+      // Bottom face
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
+      0.5f, -0.5f, -0.5f, 1.0f, 1.0f,   // top-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
+      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
+      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
+      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
+      // Top face
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
+      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
+      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
+      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
+      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f    // bottom-left
+  };
+
+  // 天空盒
+  unsigned int skybox_vao, skybox_vbo;
+  glGenVertexArrays(1, &skybox_vao);
+  glGenBuffers(1, &skybox_vbo);
+  glBindVertexArray(skybox_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), skybox_vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
+  glBindVertexArray(0);
+
+  // 立方体
+  unsigned int cube_vao, cube_vbo;
+  glGenVertexArrays(1, &cube_vao);
+  glGenBuffers(1, &cube_vbo);
+  glBindVertexArray(cube_vao);
+  glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                        reinterpret_cast<void*>(3 * sizeof(float)));
+  glBindVertexArray(0);
+
+  const auto skybox_program = Program(VertexShader("../shader/vertex_shader/skybox.vert"),
+                                      FragmentShader("../shader/fragment_shader/skybox.frag"));
+  const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
+                               FragmentShader("../shader/fragment_shader/depth_testing.frag"));
+
+  // 相机
+  auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
+  camera.SetPosition(glm::vec3(0.0f, 0.0f, 3.0f));
+  auto controls = Controls(camera, window);
+
+  // 渲染循环 (render loop)
+  while (!glfwWindowShouldClose(window)) {
+    // 输入
+    HandleKeyboardInput(window);
+
+    // 清除缓冲
+    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    controls.Update();
+
+    skybox_program.Use();
+    // 移除矩阵位移部分
+    skybox_program.SetUniform("view", glm::mat4(glm::mat3(camera.ViewMatrix())));
+    skybox_program.SetUniform("projection", camera.ProjectionMatrix());
+
+    program.Use();
+    program.SetUniform("view", camera.ViewMatrix());
+    program.SetUniform("model", glm::mat4(1.0f));
+    program.SetUniform("projection", camera.ProjectionMatrix());
+
+    // 绘制天空盒
+    glDepthMask(GL_FALSE);
+    skybox_program.Use();
+    glBindVertexArray(skybox_vao);
+    skybox_texture.Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+    glDepthMask(GL_TRUE);
+
+    // 绘制立方体
+    program.Use();
+    glBindVertexArray(cube_vao);
+    cube_texture.Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glBindVertexArray(0);
+
+    // 交换颜色缓冲
+    glfwSwapBuffers(window);
+
+    // 检查触发事件（键盘输入、鼠标移动等）
+    glfwPollEvents();
+  }
+
+  glDeleteVertexArrays(1, &skybox_vao);
+  glDeleteBuffers(1, &skybox_vbo);
+  glDeleteVertexArrays(1, &cube_vao);
+  glDeleteBuffers(1, &cube_vbo);
+
+  glfwTerminate();
+  return 0;
+}

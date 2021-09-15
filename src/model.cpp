@@ -26,10 +26,10 @@ std::vector<std::shared_ptr<Texture>> Model::LoadMaterialTextures(const aiMateri
   auto texture_type = Texture::Type::kDefault;
   switch (type) {
     case aiTextureType_DIFFUSE:
-      texture_type = Texture::Type::kDiffuseMapping;
+      texture_type = Texture::Type::kDiffuseMap;
       break;
     case aiTextureType_SPECULAR:
-      texture_type = Texture::Type::kSpecularMapping;
+      texture_type = Texture::Type::kSpecularMap;
       break;
     default:
       break;

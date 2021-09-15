@@ -5,10 +5,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 class Texture {
  public:
-  enum class Type { kDefault, kDiffuseMapping, kSpecularMapping };
+  enum class Type { kDefault, kCubeMap, kDiffuseMap, kSpecularMap };
 
   enum class Format { kDefault, kDepthComponent, kDepthStencil, kStencilIndex };
 
@@ -16,6 +17,9 @@ class Texture {
 
   // 创建指定尺寸的空纹理
   Texture(int width, int height, Format format = Format::kDefault);
+
+  // 创建立方体贴图
+  explicit Texture(const std::vector<std::string>& paths);
 
   ~Texture();
 
