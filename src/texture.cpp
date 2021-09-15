@@ -61,7 +61,7 @@ Texture::Texture(int width, int height, enum Format format)
       break;
     case Format::kDepthStencil:
       glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
-                   GL_UNSIGNED_INT_24_8, NULL);
+                   GL_UNSIGNED_INT_24_8, nullptr);
       break;
     case Format::kStencilIndex:
       glTexImage2D(GL_TEXTURE_2D, 0, GL_STENCIL_INDEX, width, height, 0, GL_STENCIL_INDEX,
@@ -77,7 +77,7 @@ Texture::Texture(const std::vector<std::string> &paths) {
   Bind();
 
   auto channels = 0;
-  //  stbi_set_flip_vertically_on_load(true);
+  stbi_set_flip_vertically_on_load(false);
   for (auto i = 0; i < paths.size(); ++i) {
     const auto &path = paths[i];
     const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);

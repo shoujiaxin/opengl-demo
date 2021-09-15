@@ -12,7 +12,11 @@ class Renderbuffer {
 
   void Bind() const;
 
+  [[nodiscard]] int Height() const;
+
   [[nodiscard]] unsigned int Id() const;
+
+  [[nodiscard]] int Width() const;
 
  private:
   int height_ = 0;

@@ -81,20 +81,18 @@ std::shared_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mes
   for (auto i = 0; i < num_vertices; ++i) {
     auto vertex = Vertex();
 
-    vertex.position_ =
-        std::move(glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z));
+    vertex.position_ = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
     if (mesh->HasNormals()) {
-      vertex.normal_ =
-          std::move(glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z));
+      vertex.normal_ = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
     }
 
     if (mesh->mTextureCoords[0]) {
       vertex.texture_coordinates_ =
-          std::move(glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y));
+          glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
     }
 
-    vertices.emplace_back(std::move(vertex));
+    vertices.emplace_back(vertex);
   }
 
   // 索引

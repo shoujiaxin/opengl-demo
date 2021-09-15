@@ -17,12 +17,12 @@ Controls::Controls(PerspectiveCamera &camera, GLFWwindow *window)
     auto height = 0;
     glfwGetWindowSize(window, &width, &height);
     auto controls = static_cast<Controls *>(glfwGetWindowUserPointer(window));
-    controls->OnMouseMove(x / width, y / height);
+    controls->OnMouseMove(static_cast<float>(x / width), static_cast<float>(y / height));
   });
 
   glfwSetScrollCallback(window, [](GLFWwindow *window, double x, double y) {
     auto controls = static_cast<Controls *>(glfwGetWindowUserPointer(window));
-    controls->OnScroll(x, y);
+    controls->OnScroll(static_cast<float>(x), static_cast<float>(y));
   });
 }
 
@@ -32,7 +32,7 @@ void Controls::Update() {
   const auto delta_time = current_time - last_frame_time_;
   last_frame_time_ = current_time;
 
-  OnKeyboardPress(delta_time);
+  OnKeyboardPress(static_cast<float>(delta_time));
   camera_.LookAt(camera_.Position() + camera_front_);
 }
 
@@ -61,7 +61,7 @@ void Controls::OnKeyboardPress(float dt) {
   camera_.SetPosition(camera_position);
 }
 
-void Controls::OnMouseMove(double x, double y) {
+void Controls::OnMouseMove(float x, float y) {
   if (first_cursor_) {
     first_cursor_ = false;
     last_cursor_position_.x = x;
@@ -84,7 +84,7 @@ void Controls::OnMouseMove(double x, double y) {
   last_cursor_position_.y = y;
 }
 
-void Controls::OnScroll(double x, double y) {
+void Controls::OnScroll(float x, float y) {
   auto fov = camera_.Fov();
   fov -= y;
   fov = std::min(fov, 50.0f);

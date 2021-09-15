@@ -18,4 +18,8 @@ Renderbuffer::~Renderbuffer() { glDeleteRenderbuffers(1, &id_); }
 
 void Renderbuffer::Bind() const { glBindRenderbuffer(GL_RENDERBUFFER, id_); }
 
+int Renderbuffer::Height() const { return height_; }
+
 unsigned int Renderbuffer::Id() const { return id_; }
+
+int Renderbuffer::Width() const { return width_; }

@@ -5,12 +5,13 @@
 #include "mesh.h"
 
 #include <string>
+#include <utility>
 
 #include "glad/glad.h"
 
-Mesh::Mesh(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices,
-           const std::vector<std::shared_ptr<Texture>> &textures)
-    : vertices_(vertices), indices_(indices), textures_(textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
+           std::vector<std::shared_ptr<Texture>> textures)
+    : vertices_(std::move(vertices)), indices_(std::move(indices)), textures_(std::move(textures)) {
   Setup();
 }
 
@@ -24,25 +25,29 @@ void Mesh::Draw(const Program &program) const {
   auto diffuse_cnt = 1;
   auto specular_cnt = 1;
 
-  for (auto i = 0; i < textures_.size(); ++i) {
-    const auto type = textures_[i]->Type();
+  for (const auto &texture : textures_) {
     std::string name;
-    if (type == Texture::Type::kDiffuseMap) {
-      name = "texture_diffuse" + std::to_string(diffuse_cnt++);
-    } else if (type == Texture::Type::kSpecularMap) {
-      name = "texture_specular" + std::to_string(specular_cnt++);
+    switch (texture->Type()) {
+      case Texture::Type::kDiffuseMap:
+        name = "texture_diffuse" + std::to_string(diffuse_cnt++);
+        break;
+      case Texture::Type::kSpecularMap:
+        name = "texture_specular" + std::to_string(specular_cnt++);
+        break;
+      default:
+        break;
     }
 
-    program.SetUniform("material." + name, static_cast<int>(textures_[i]->Id()));
-    glActiveTexture(GL_TEXTURE0 + textures_[i]->Id());
-    textures_[i]->Bind();
+    program.SetUniform("material." + name, static_cast<int>(texture->Id()));
+    glActiveTexture(GL_TEXTURE0 + texture->Id());
+    texture->Bind();
   }
 
   glActiveTexture(GL_TEXTURE0);
 
   // 绘制
   glBindVertexArray(vertex_array_object_);
-  glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, nullptr);
+  glDrawElements(GL_TRIANGLES, static_cast<int>(indices_.size()), GL_UNSIGNED_INT, nullptr);
   glBindVertexArray(0);
 }
 
@@ -54,11 +59,12 @@ void Mesh::Setup() {
   glBindVertexArray(vertex_array_object_);
 
   glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_object_);
-  glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(Vertex), &vertices_[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, static_cast<int>(vertices_.size() * sizeof(Vertex)), &vertices_[0],
+               GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, element_buffer_object_);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(unsigned int), &indices_[0],
-               GL_STATIC_DRAW);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<int>(indices_.size() * sizeof(unsigned int)),
+               &indices_[0], GL_STATIC_DRAW);
 
   // 位置
   glEnableVertexAttribArray(0);
