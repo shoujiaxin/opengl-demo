@@ -93,49 +93,48 @@ int main() {
                                    1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
   float cube_vertices[] = {
-      // ----- 位置 -----, --- 纹理坐标 ---
-      // Back face
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom-left
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
-      0.5f, -0.5f, -0.5f, 1.0f, 0.0f,   // bottom-right
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,    // top-right
-      -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // bottom-left
-      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,   // top-left
-      // Front face
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
-      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   // bottom-right
-      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
-      0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    // top-right
-      -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   // top-left
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  // bottom-left
-      // Left face
-      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
-      -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-left
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-left
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
-      -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-right
-      // Right face
-      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
-      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
-      0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // bottom-right
-      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // top-left
-      0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-left
-      // Bottom face
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
-      0.5f, -0.5f, -0.5f, 1.0f, 1.0f,   // top-left
-      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
-      0.5f, -0.5f, 0.5f, 1.0f, 0.0f,    // bottom-left
-      -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   // bottom-right
-      -0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  // top-right
-      // Top face
-      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
-      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
-      0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   // top-right
-      0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    // bottom-right
-      -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
-      -0.5f, 0.5f, 0.5f, 0.0f, 0.0f    // bottom-left
+      // ------ 位置 ------, ------ 法向量 ------
+      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,  //
+      0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,  //
+      0.5f,  -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,  //
+      0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,  //
+      -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,  //
+      -0.5f, 0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,  //
+
+      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  //
+      0.5f,  -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  //
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  //
+      0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  //
+      -0.5f, 0.5f,  0.5f,  0.0f,  0.0f,  1.0f,  //
+      -0.5f, -0.5f, 0.5f,  0.0f,  0.0f,  1.0f,  //
+
+      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  //
+      -0.5f, 0.5f,  -0.5f, -1.0f, 0.0f,  0.0f,  //
+      -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  //
+      -0.5f, -0.5f, -0.5f, -1.0f, 0.0f,  0.0f,  //
+      -0.5f, -0.5f, 0.5f,  -1.0f, 0.0f,  0.0f,  //
+      -0.5f, 0.5f,  0.5f,  -1.0f, 0.0f,  0.0f,  //
+
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  //
+      0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  //
+      0.5f,  0.5f,  -0.5f, 1.0f,  0.0f,  0.0f,  //
+      0.5f,  -0.5f, -0.5f, 1.0f,  0.0f,  0.0f,  //
+      0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  //
+      0.5f,  -0.5f, 0.5f,  1.0f,  0.0f,  0.0f,  //
+
+      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  //
+      0.5f,  -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  //
+      0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  //
+      0.5f,  -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  //
+      -0.5f, -0.5f, 0.5f,  0.0f,  -1.0f, 0.0f,  //
+      -0.5f, -0.5f, -0.5f, 0.0f,  -1.0f, 0.0f,  //
+
+      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  //
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  //
+      0.5f,  0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  //
+      0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  //
+      -0.5f, 0.5f,  -0.5f, 0.0f,  1.0f,  0.0f,  //
+      -0.5f, 0.5f,  0.5f,  0.0f,  1.0f,  0.0f   //
   };
 
   // 天空盒
@@ -157,16 +156,16 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
                         reinterpret_cast<void*>(3 * sizeof(float)));
   glBindVertexArray(0);
 
   const auto skybox_program = Program(VertexShader("../shader/vertex_shader/skybox.vert"),
                                       FragmentShader("../shader/fragment_shader/skybox.frag"));
-  const auto program = Program(VertexShader("../shader/vertex_shader/depth_testing.vert"),
-                               FragmentShader("../shader/fragment_shader/depth_testing.frag"));
+  const auto program = Program(VertexShader("../shader/vertex_shader/reflection.vert"),
+                               FragmentShader("../shader/fragment_shader/reflection.frag"));
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -193,6 +192,7 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("model", glm::mat4(1.0f));
     program.SetUniform("projection", camera.ProjectionMatrix());
+    program.SetUniform("cameraPos", camera.Position());
 
     // 绘制天空盒
     glDepthMask(GL_FALSE);
