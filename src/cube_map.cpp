@@ -165,7 +165,7 @@ int main() {
   const auto skybox_program = Program(VertexShader("../shader/vertex_shader/skybox.vert"),
                                       FragmentShader("../shader/fragment_shader/skybox.frag"));
   const auto program = Program(VertexShader("../shader/vertex_shader/reflection.vert"),
-                               FragmentShader("../shader/fragment_shader/reflection.frag"));
+                               FragmentShader("../shader/fragment_shader/refraction.frag"));
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
