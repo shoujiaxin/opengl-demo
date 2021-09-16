@@ -6,8 +6,12 @@
 
 #include <string>
 
+#include "glad/glad.h"
+
 class Shader {
  public:
+  Shader(GLenum type, const std::string& path);
+
   virtual ~Shader();
 
   // 着色器 ID

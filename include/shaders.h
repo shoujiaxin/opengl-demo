@@ -4,6 +4,14 @@
 
 #pragma once
 
-#include "../src/shader/fragment_shader.h"
 #include "../src/shader/program.h"
-#include "../src/shader/vertex_shader.h"
+
+class FragmentShader final : public Shader {
+ public:
+  explicit FragmentShader(const std::string& path) : Shader(GL_FRAGMENT_SHADER, path){};
+};
+
+class VertexShader final : public Shader {
+ public:
+  explicit VertexShader(const std::string& path) : Shader(GL_VERTEX_SHADER, path) {}
+};

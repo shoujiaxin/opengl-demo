@@ -8,7 +8,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "glad/glad.h"
+Shader::Shader(GLenum type, const std::string &path) : id_(glCreateShader(type)) {
+  Compile(LoadSourceFrom(path));
+}
 
 Shader::~Shader() { glDeleteShader(id_); }
 
