@@ -7,6 +7,8 @@
 
 #include "cameras.h"
 #include "controls.h"
+#include "glm/gtc/matrix_transform.hpp"
+#include "model.h"
 #include "shaders.h"
 #include "texture.h"
 
@@ -162,10 +164,16 @@ int main() {
                         reinterpret_cast<void*>(3 * sizeof(float)));
   glBindVertexArray(0);
 
+  // 模型
+  const auto model = Model("../resource/model/nanosuit/nanosuit.obj");
+
   const auto skybox_program = Program(VertexShader("../shader/vertex_shader/skybox.vert"),
                                       FragmentShader("../shader/fragment_shader/skybox.frag"));
   const auto program = Program(VertexShader("../shader/vertex_shader/reflection.vert"),
                                FragmentShader("../shader/fragment_shader/refraction.frag"));
+  const auto model_program =
+      Program(VertexShader("../shader/vertex_shader/multiple_lights.vert"),
+              FragmentShader("../shader/fragment_shader/model_reflection.frag"));
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -198,6 +206,8 @@ int main() {
     glDepthMask(GL_FALSE);
     skybox_program.Use();
     glBindVertexArray(skybox_vao);
+    skybox_program.SetUniform("skybox", 0);
+    glActiveTexture(GL_TEXTURE0);
     skybox_texture.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
@@ -206,9 +216,22 @@ int main() {
     // 绘制立方体
     program.Use();
     glBindVertexArray(cube_vao);
-    cube_texture.Bind();
+    //    cube_texture.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
     glBindVertexArray(0);
+
+    auto model_matrix = glm::mat4(1.0f);
+    model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, -0.5f, 0.0f));
+    model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
+    model_program.Use();
+    model_program.SetUniform("view", camera.ViewMatrix());
+    model_program.SetUniform("model", model_matrix);
+    model_program.SetUniform("projection", camera.ProjectionMatrix());
+    model_program.SetUniform("viewPos", camera.Position());
+    model_program.SetUniform("skybox", 1);
+    glActiveTexture(GL_TEXTURE1);
+    skybox_texture.Bind();
+    model.Draw(model_program);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);

@@ -23,15 +23,19 @@ Mesh::~Mesh() {
 
 void Mesh::Draw(const Program &program) const {
   auto diffuse_cnt = 1;
+  auto reflection_cnt = 1;
   auto specular_cnt = 1;
 
   for (const auto &texture : textures_) {
     std::string name;
     switch (texture->Type()) {
-      case Texture::Type::kDiffuseMap:
+      case Texture::Type::kDiffuseMapping:
         name = "texture_diffuse" + std::to_string(diffuse_cnt++);
         break;
-      case Texture::Type::kSpecularMap:
+      case Texture::Type::kReflectionMapping:
+        name = "texture_reflection" + std::to_string(reflection_cnt++);
+        break;
+      case Texture::Type::kSpecularMapping:
         name = "texture_specular" + std::to_string(specular_cnt++);
         break;
       default:

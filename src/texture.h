@@ -9,7 +9,7 @@
 
 class Texture {
  public:
-  enum class Type { kDefault, kCubeMap, kDiffuseMap, kSpecularMap };
+  enum class Type { kDefault, kCubeMapping, kDiffuseMapping, kReflectionMapping, kSpecularMapping };
 
   enum class Format { kDefault, kDepthComponent, kDepthStencil, kStencilIndex };
 

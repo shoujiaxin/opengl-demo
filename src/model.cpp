@@ -25,11 +25,14 @@ std::vector<std::shared_ptr<Texture>> Model::LoadMaterialTextures(const aiMateri
                                                                   aiTextureType type) {
   auto texture_type = Texture::Type::kDefault;
   switch (type) {
+    case aiTextureType_AMBIENT:
+      texture_type = Texture::Type::kReflectionMapping;
+      break;
     case aiTextureType_DIFFUSE:
-      texture_type = Texture::Type::kDiffuseMap;
+      texture_type = Texture::Type::kDiffuseMapping;
       break;
     case aiTextureType_SPECULAR:
-      texture_type = Texture::Type::kSpecularMap;
+      texture_type = Texture::Type::kSpecularMapping;
       break;
     default:
       break;
@@ -107,11 +110,17 @@ std::shared_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mes
   if (mesh->mMaterialIndex >= 0) {
     const auto material = scene->mMaterials[mesh->mMaterialIndex];
 
+    // 漫反射贴图
     const auto diffuse_maps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
     textures.insert(textures.end(), diffuse_maps.cbegin(), diffuse_maps.cend());
 
+    // 镜面光贴图
     const auto specular_maps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
     textures.insert(textures.end(), specular_maps.cbegin(), specular_maps.cend());
+
+    // 反射贴图
+    const auto reflection_maps = LoadMaterialTextures(material, aiTextureType_AMBIENT);
+    textures.insert(textures.end(), reflection_maps.cbegin(), reflection_maps.cend());
   }
 
   return std::make_shared<Mesh>(vertices, indices, textures);

@@ -117,7 +117,7 @@ Texture::Texture(const std::vector<std::string> &paths) {
 Texture::~Texture() { glDeleteTextures(1, &id_); }
 
 void Texture::Bind() const {
-  if (type_ == Type::kCubeMap) {
+  if (type_ == Type::kCubeMapping) {
     glBindTexture(GL_TEXTURE_CUBE_MAP, id_);
   } else {
     glBindTexture(GL_TEXTURE_2D, id_);
@@ -130,7 +130,7 @@ unsigned int Texture::Id() const { return id_; }
 
 void Texture::SetFiltering(int operation, int method) const {
   Bind();
-  if (type_ == Type::kCubeMap) {
+  if (type_ == Type::kCubeMapping) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, operation, method);
   } else {
     glTexParameteri(GL_TEXTURE_2D, operation, method);
@@ -141,7 +141,7 @@ void Texture::SetType(enum Type value) { type_ = value; }
 
 void Texture::SetWrap(int axis, int mode) const {
   Bind();
-  if (type_ == Type::kCubeMap) {
+  if (type_ == Type::kCubeMapping) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, axis, mode);
   } else {
     glTexParameteri(GL_TEXTURE_2D, axis, mode);
