@@ -4,5 +4,6 @@
 
 #pragma once
 
+#include "../src/buffer/buffer.h"
 #include "../src/buffer/framebuffer.h"
 #include "../src/buffer/renderbuffer.h"

@@ -4,6 +4,7 @@
 // clang-format on
 
 #include <iostream>
+#include <vector>
 
 #include "buffers.h"
 #include "cameras.h"
@@ -68,7 +69,7 @@ int main() {
   const auto screen_program = Program(VertexShader("../shader/vertex_shader/framebuffer.vert"),
                                       FragmentShader("../shader/fragment_shader/framebuffer.frag"));
 
-  float cube_vertices[] = {
+  const auto cube_vertices = std::vector<float>{
       // ----- 位置 -----, --- 纹理坐标 ---
       // Back face
       -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,  // Bottom-left
@@ -113,7 +114,7 @@ int main() {
       -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  // top-left
       -0.5f, 0.5f, 0.5f, 0.0f, 0.0f    // bottom-left
   };
-  float plane_vertices[] = {
+  const auto plane_vertices = std::vector<float>{
       // ----- 位置 -----, --- 纹理坐标 ---
       5.0f,  -0.5f, 5.0f,  2.0f, 0.0f,  //
       -5.0f, -0.5f, -5.0f, 0.0f, 2.0f,  //
@@ -123,7 +124,7 @@ int main() {
       5.0f,  -0.5f, -5.0f, 2.0f, 2.0f,  //
       -5.0f, -0.5f, -5.0f, 0.0f, 2.0f   //
   };
-  float quad_vertices[] = {
+  const auto quad_vertices = std::vector<float>{
       // -- 位置 --, -- 纹理坐标 --
       -1.0f, 1.0f,  0.0f, 1.0f,  //
       -1.0f, -1.0f, 0.0f, 0.0f,  //
@@ -154,12 +155,10 @@ int main() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // 立方体
-  unsigned int cube_vao, cube_vbo;
+  unsigned int cube_vao;
   glGenVertexArrays(1, &cube_vao);
-  glGenBuffers(1, &cube_vbo);
   glBindVertexArray(cube_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+  const auto cube_vbo = Buffer(Buffer::Target::kArrayBuffer, cube_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -168,12 +167,10 @@ int main() {
   glBindVertexArray(0);
 
   // 平面
-  unsigned int plane_vao, plane_vbo;
+  unsigned int plane_vao;
   glGenVertexArrays(1, &plane_vao);
-  glGenBuffers(1, &plane_vbo);
   glBindVertexArray(plane_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, plane_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(plane_vertices), plane_vertices, GL_STATIC_DRAW);
+  const auto plane_vbo = Buffer(Buffer::Target::kArrayBuffer, plane_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -182,12 +179,10 @@ int main() {
   glBindVertexArray(0);
 
   // 屏幕矩形
-  unsigned int quad_vao, quad_vbo;
+  unsigned int quad_vao;
   glGenVertexArrays(1, &quad_vao);
-  glGenBuffers(1, &quad_vbo);
   glBindVertexArray(quad_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
+  const auto quad_vbo = Buffer(Buffer::Target::kArrayBuffer, quad_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -270,11 +265,8 @@ int main() {
   }
 
   glDeleteVertexArrays(1, &cube_vao);
-  glDeleteBuffers(1, &cube_vbo);
   glDeleteVertexArrays(1, &plane_vao);
-  glDeleteBuffers(1, &plane_vbo);
   glDeleteVertexArrays(1, &quad_vao);
-  glDeleteBuffers(1, &quad_vbo);
 
   glfwTerminate();
   return 0;
