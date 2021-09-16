@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "../src/texture.h"
 #include "renderbuffer.h"
-#include "texture.h"
 
 class Framebuffer {
  public:

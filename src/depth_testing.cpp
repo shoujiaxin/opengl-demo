@@ -5,9 +5,9 @@
 
 #include <iostream>
 
+#include "buffers.h"
 #include "cameras.h"
 #include "controls.h"
-#include "framebuffer.h"
 #include "glm/gtc/matrix_transform.hpp"
 #include "shaders.h"
 #include "texture.h"
