@@ -7,7 +7,7 @@
 #include "GLFW/glfw3.h"
 #include "cameras.h"
 
-class Controls {
+class Controls final {
  public:
   Controls(PerspectiveCamera& camera, GLFWwindow* window);
 

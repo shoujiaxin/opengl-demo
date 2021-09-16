@@ -7,7 +7,7 @@
 #include "../src/texture.h"
 #include "renderbuffer.h"
 
-class Framebuffer {
+class Framebuffer final {
  public:
   Framebuffer();
 

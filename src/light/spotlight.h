@@ -6,7 +6,7 @@
 
 #include "point_light.h"
 
-class Spotlight : public PointLight {
+class Spotlight final : public PointLight {
  public:
   struct CutOff {
     // 内切光角余弦值

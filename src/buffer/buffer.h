@@ -10,50 +10,45 @@
 
 class Buffer {
  public:
-  enum class Target { kArrayBuffer };
-
-  explicit Buffer(Target target);
+  explicit Buffer(GLenum target);
 
   template <class T>
-  Buffer(Target target, const std::vector<T>& data);
+  explicit Buffer(const std::vector<T>& data);
 
   template <class T>
-  Buffer(Target target, const T* data, int size);
+  Buffer(const T* data, int size);
 
-  ~Buffer();
+  virtual ~Buffer();
 
   void Bind() const;
 
   // 复制缓冲内容
-  void CopyDataFrom(const Buffer& source);
+  void CopyData(const Buffer& source);
 
   [[nodiscard]] unsigned int Id() const;
 
   template <class T>
   void SetData(const T* data, int size);
 
- private:
-  [[nodiscard]] GLenum BindingTarget() const;
-
+ protected:
   unsigned int id_ = 0;
 
   int size_ = 0;
 
-  Target target_ = Target::kArrayBuffer;
+  GLenum target_ = 0;
 };
 
 template <class T>
-Buffer::Buffer(Target target, const T* data, int size) : Buffer(target) {
+Buffer::Buffer(const std::vector<T>& data) : Buffer(&data.front(), data.size() * sizeof(T)) {}
+
+template <class T>
+Buffer::Buffer(const T* data, int size) : Buffer(target_) {
   SetData(data, size);
 }
 
 template <class T>
-Buffer::Buffer(Target target, const std::vector<T>& data)
-    : Buffer(target, &data.front(), data.size() * sizeof(T)) {}
-
-template <class T>
 void Buffer::SetData(const T* data, int size) {
   Bind();
-  glBufferData(BindingTarget(), size, data, GL_STATIC_DRAW);
+  glBufferData(target_, size, data, GL_STATIC_DRAW);
   size_ = size;
 }

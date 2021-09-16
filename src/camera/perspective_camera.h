@@ -6,7 +6,7 @@
 
 #include "camera.h"
 
-class PerspectiveCamera : public Camera {
+class PerspectiveCamera final : public Camera {
  public:
   explicit PerspectiveCamera(float fov = 50.0f, float aspect = 1.0f, float near = 0.1f,
                              float far = 2000.0f);

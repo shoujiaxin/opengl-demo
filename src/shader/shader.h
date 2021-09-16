@@ -8,7 +8,7 @@
 
 class Shader {
  public:
-  ~Shader();
+  virtual ~Shader();
 
   // 着色器 ID
   [[nodiscard]] unsigned int Id() const;

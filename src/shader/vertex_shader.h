@@ -6,7 +6,7 @@
 
 #include "shader.h"
 
-class VertexShader : public Shader {
+class VertexShader final : public Shader {
  public:
   explicit VertexShader(const std::string& path);
 };

@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-class Texture {
+class Texture final {
  public:
   enum class Type { kDefault, kCubeMapping, kDiffuseMapping, kReflectionMapping, kSpecularMapping };
 

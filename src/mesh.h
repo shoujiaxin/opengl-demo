@@ -11,7 +11,7 @@
 #include "shaders.h"
 #include "texture.h"
 
-struct Vertex {
+struct Vertex final {
   // 法向量
   glm::vec3 normal_ = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -22,7 +22,7 @@ struct Vertex {
   glm::vec2 texture_coordinates_ = glm::vec2(0.0f, 0.0f);
 };
 
-class Mesh {
+class Mesh final {
  public:
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
        std::vector<std::shared_ptr<Texture>> textures);

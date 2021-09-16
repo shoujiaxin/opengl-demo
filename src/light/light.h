@@ -8,7 +8,7 @@
 
 #include "glm/glm.hpp"
 
-struct Color {
+struct Color final {
   static const Color kBlack;
   static const Color kBlue;
   static const Color kGreen;

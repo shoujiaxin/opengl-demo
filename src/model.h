@@ -13,7 +13,7 @@
 #include "mesh.h"
 #include "shaders.h"
 
-class Model {
+class Model final {
  public:
   explicit Model(const std::string& path);
 

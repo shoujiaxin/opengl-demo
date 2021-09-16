@@ -4,15 +4,15 @@
 
 #include "buffer.h"
 
-Buffer::Buffer(Target target) : target_(target) { glGenBuffers(1, &id_); }
+Buffer::Buffer(GLenum target) : target_(target) { glGenBuffers(1, &id_); }
 
 Buffer::~Buffer() { glDeleteBuffers(1, &id_); }
 
-void Buffer::Bind() const { glBindBuffer(BindingTarget(), id_); }
+void Buffer::Bind() const { glBindBuffer(target_, id_); }
 
-void Buffer::CopyDataFrom(const Buffer &source) {
-  auto read_target = source.BindingTarget();
-  auto write_target = BindingTarget();
+void Buffer::CopyData(const Buffer &source) {
+  auto read_target = source.target_;
+  auto write_target = target_;
 
   if (target_ == source.target_) {
     read_target = GL_COPY_READ_BUFFER;
@@ -26,12 +26,3 @@ void Buffer::CopyDataFrom(const Buffer &source) {
 }
 
 unsigned int Buffer::Id() const { return id_; }
-
-GLenum Buffer::BindingTarget() const {
-  switch (target_) {
-    case Target::kArrayBuffer:
-      return GL_ARRAY_BUFFER;
-    default:
-      assert(false);
-  }
-}

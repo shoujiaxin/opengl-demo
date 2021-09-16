@@ -6,7 +6,7 @@
 
 #include "light.h"
 
-class DirectionalLight : public Light {
+class DirectionalLight final : public Light {
  public:
   DirectionalLight(const struct Color& color, float intensity);
 

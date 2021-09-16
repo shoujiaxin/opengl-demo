@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include "shader.h"
 
-class Program {
+class Program final {
  public:
   Program();
 

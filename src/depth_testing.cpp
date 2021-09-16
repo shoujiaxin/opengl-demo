@@ -158,7 +158,7 @@ int main() {
   unsigned int cube_vao;
   glGenVertexArrays(1, &cube_vao);
   glBindVertexArray(cube_vao);
-  const auto cube_vbo = Buffer(Buffer::Target::kArrayBuffer, cube_vertices);
+  const auto cube_vbo = ArrayBuffer(cube_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -170,7 +170,7 @@ int main() {
   unsigned int plane_vao;
   glGenVertexArrays(1, &plane_vao);
   glBindVertexArray(plane_vao);
-  const auto plane_vbo = Buffer(Buffer::Target::kArrayBuffer, plane_vertices);
+  const auto plane_vbo = ArrayBuffer(plane_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -182,7 +182,7 @@ int main() {
   unsigned int quad_vao;
   glGenVertexArrays(1, &quad_vao);
   glBindVertexArray(quad_vao);
-  const auto quad_vbo = Buffer(Buffer::Target::kArrayBuffer, quad_vertices);
+  const auto quad_vbo = ArrayBuffer(quad_vertices);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);

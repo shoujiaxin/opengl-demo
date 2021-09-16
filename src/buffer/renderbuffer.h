@@ -4,7 +4,7 @@
 
 #pragma once
 
-class Renderbuffer {
+class Renderbuffer final {
  public:
   Renderbuffer(int width, int height);
 
