@@ -28,13 +28,10 @@ void main() {
     vec3 R = reflect(-viewDir, norm);
 
     float diff = max(dot(norm, viewDir), 0.0);
-    vec3 diffuse1 = diff * vec3(texture(material.texture_diffuse1, TexCoords));
-    vec3 diffuse2 = diff * vec3(texture(material.texture_diffuse2, TexCoords));
+    vec3 diffuse = diff * vec3(texture(material.texture_diffuse1, TexCoords));
 
-    vec3 reflectMap1 = vec3(texture(material.texture_reflection1, TexCoords));
-    vec3 reflection1 = vec3(texture(skybox, R).rgb) * reflectMap1;
-    vec3 reflectMap2 = vec3(texture(material.texture_reflection2, TexCoords));
-    vec3 reflection2 = vec3(texture(skybox, R).rgb) * reflectMap2;
+    vec3 reflectMap = vec3(texture(material.texture_reflection1, TexCoords));
+    vec3 reflection = vec3(texture(skybox, R).rgb) * reflectMap;
 
-    FragColor = vec4(diffuse1 + diffuse2 + reflection1 + reflection2, 1.0);
+    FragColor = vec4(diffuse + reflection, 1.0);
 }
