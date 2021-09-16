@@ -6,21 +6,16 @@
 
 #include <vector>
 
+#include "../util/bindable.h"
 #include "glad/glad.h"
 
-class Buffer {
+class Buffer : public Bindable {
  public:
   explicit Buffer(GLenum target);
 
-  template <class T>
-  explicit Buffer(const std::vector<T>& data);
-
-  template <class T>
-  Buffer(const T* data, int size);
-
   virtual ~Buffer();
 
-  void Bind() const;
+  void Bind() const override;
 
   // 复制缓冲内容
   void CopyData(const Buffer& source);
@@ -29,6 +24,8 @@ class Buffer {
 
   template <class T>
   void SetData(const T* data, int size);
+
+  void Unbind() const override;
 
  protected:
   unsigned int id_ = 0;
@@ -39,16 +36,8 @@ class Buffer {
 };
 
 template <class T>
-Buffer::Buffer(const std::vector<T>& data) : Buffer(&data.front(), data.size() * sizeof(T)) {}
-
-template <class T>
-Buffer::Buffer(const T* data, int size) : Buffer(target_) {
-  SetData(data, size);
-}
-
-template <class T>
 void Buffer::SetData(const T* data, int size) {
-  Bind();
+  const auto guard = BindGuard(*this);
   glBufferData(target_, size, data, GL_STATIC_DRAW);
   size_ = size;
 }

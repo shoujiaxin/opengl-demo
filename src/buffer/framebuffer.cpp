@@ -11,13 +11,13 @@ Framebuffer::Framebuffer() { glGenFramebuffers(1, &id_); }
 Framebuffer::~Framebuffer() { glDeleteFramebuffers(1, &id_); }
 
 void Framebuffer::Attach(const Renderbuffer &renderbuffer) const {
-  Bind();
+  const auto guard = BindGuard(*this);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER,
                             renderbuffer.Id());
 }
 
 void Framebuffer::Attach(const Texture &texture) const {
-  Bind();
+  const auto guard = BindGuard(*this);
   switch (texture.Format()) {
     case Texture::Format::kDefault:
       glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.Id(), 0);
@@ -40,6 +40,8 @@ void Framebuffer::Attach(const Texture &texture) const {
 void Framebuffer::Bind() const { glBindFramebuffer(GL_FRAMEBUFFER, id_); }
 
 bool Framebuffer::IsComplete() const {
-  Bind();
+  const auto guard = BindGuard(*this);
   return glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE;
 }
+
+void Framebuffer::Unbind() const { glBindFramebuffer(GL_FRAMEBUFFER, 0); }

@@ -15,6 +15,8 @@ class Program final {
 
   ~Program();
 
+  void BindUniformBlock(const std::string& name, int binding_point) const;
+
   void SetUniform(const std::string& name, bool value) const;
 
   void SetUniform(const std::string& name, float value) const;

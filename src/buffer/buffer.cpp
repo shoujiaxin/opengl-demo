@@ -26,3 +26,5 @@ void Buffer::CopyData(const Buffer &source) {
 }
 
 unsigned int Buffer::Id() const { return id_; }
+
+void Buffer::Unbind() const { glBindBuffer(target_, 0); }

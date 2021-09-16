@@ -5,9 +5,10 @@
 #pragma once
 
 #include "../src/texture.h"
+#include "../util/bindable.h"
 #include "renderbuffer.h"
 
-class Framebuffer final {
+class Framebuffer final : public Bindable {
  public:
   Framebuffer();
 
@@ -19,9 +20,11 @@ class Framebuffer final {
   // 添加纹理附件
   void Attach(const Texture& texture) const;
 
-  void Bind() const;
+  void Bind() const override;
 
   [[nodiscard]] bool IsComplete() const;
+
+  void Unbind() const override;
 
  private:
   unsigned int id_ = 0;

@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "buffers.h"
 #include "cameras.h"
 #include "controls.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -76,25 +77,26 @@ int main() {
   const auto cube_texture = Texture("../resource/texture/container.jpg");
 
   // 天空盒顶点
-  const float skybox_vertices[] = {-1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
-                                   1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+  const auto skybox_vertices =
+      std::vector<float>{-1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+                         1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
 
-                                   -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
-                                   -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+                         -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+                         -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
 
-                                   1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
-                                   1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+                         1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+                         1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
 
-                                   -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
-                                   1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+                         -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+                         1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
 
-                                   -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
-                                   1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+                         -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+                         1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
 
-                                   -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
-                                   1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+                         -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+                         1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
 
-  float cube_vertices[] = {
+  const auto cube_vertices = std::vector<float>{
       // ------ 位置 ------, ------ 法向量 ------
       -0.5f, -0.5f, -0.5f, 0.0f,  0.0f,  -1.0f,  //
       0.5f,  0.5f,  -0.5f, 0.0f,  0.0f,  -1.0f,  //
@@ -140,23 +142,21 @@ int main() {
   };
 
   // 天空盒
-  unsigned int skybox_vao, skybox_vbo;
+  unsigned int skybox_vao;
   glGenVertexArrays(1, &skybox_vao);
-  glGenBuffers(1, &skybox_vbo);
   glBindVertexArray(skybox_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, skybox_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(skybox_vertices), skybox_vertices, GL_STATIC_DRAW);
+  const auto skybox_vbo = ArrayBuffer(skybox_vertices);
+  skybox_vbo.Bind();
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
   glBindVertexArray(0);
 
   // 立方体
-  unsigned int cube_vao, cube_vbo;
+  unsigned int cube_vao;
   glGenVertexArrays(1, &cube_vao);
-  glGenBuffers(1, &cube_vbo);
   glBindVertexArray(cube_vao);
-  glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
+  const auto cube_vbo = ArrayBuffer(cube_vertices);
+  cube_vbo.Bind();
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -241,9 +241,7 @@ int main() {
   }
 
   glDeleteVertexArrays(1, &skybox_vao);
-  glDeleteBuffers(1, &skybox_vbo);
   glDeleteVertexArrays(1, &cube_vao);
-  glDeleteBuffers(1, &cube_vbo);
 
   glfwTerminate();
   return 0;

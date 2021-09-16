@@ -137,28 +137,25 @@ int main() {
 
   // 帧缓冲
   const auto framebuffer = Framebuffer();
-  framebuffer.Bind();
   // 生成纹理，作为颜色附件（Retina 屏幕，长宽需 x2）
   const auto texture_color_buffer = Texture(2 * SCR_WIDTH, 2 * SCR_HEIGHT);
   texture_color_buffer.SetFiltering(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   texture_color_buffer.SetFiltering(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glBindTexture(GL_TEXTURE_2D, 0);
   framebuffer.Attach(texture_color_buffer);
   // 生成渲染缓冲对象，作为深度（和模板）附件（Retina 屏幕，长宽需 x2）
   const auto render_buffer = Renderbuffer(2 * SCR_WIDTH, 2 * SCR_HEIGHT);
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
   framebuffer.Attach(render_buffer);
   // 检查帧缓冲是否完整
   if (!framebuffer.IsComplete()) {
     std::cerr << "Framebuffer is not complete!" << std::endl;
   }
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // 立方体
   unsigned int cube_vao;
   glGenVertexArrays(1, &cube_vao);
   glBindVertexArray(cube_vao);
   const auto cube_vbo = ArrayBuffer(cube_vertices);
+  cube_vbo.Bind();
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -171,6 +168,7 @@ int main() {
   glGenVertexArrays(1, &plane_vao);
   glBindVertexArray(plane_vao);
   const auto plane_vbo = ArrayBuffer(plane_vertices);
+  plane_vbo.Bind();
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -183,6 +181,7 @@ int main() {
   glGenVertexArrays(1, &quad_vao);
   glBindVertexArray(quad_vao);
   const auto quad_vbo = ArrayBuffer(quad_vertices);
+  quad_vbo.Bind();
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
   glEnableVertexAttribArray(1);
@@ -246,7 +245,7 @@ int main() {
     glBindVertexArray(0);
 
     // 使用默认帧缓冲
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    framebuffer.Unbind();
     glDisable(GL_DEPTH_TEST);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);

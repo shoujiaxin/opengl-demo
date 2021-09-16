@@ -4,17 +4,21 @@
 
 #pragma once
 
-class Renderbuffer final {
+#include "../util/bindable.h"
+
+class Renderbuffer final : public Bindable {
  public:
   Renderbuffer(int width, int height);
 
   ~Renderbuffer();
 
-  void Bind() const;
+  void Bind() const override;
 
   [[nodiscard]] int Height() const;
 
   [[nodiscard]] unsigned int Id() const;
+
+  void Unbind() const override;
 
   [[nodiscard]] int Width() const;
 

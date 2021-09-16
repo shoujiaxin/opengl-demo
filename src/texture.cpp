@@ -23,7 +23,7 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
   // 创建纹理
   glGenTextures(1, &id_);
   // 绑定纹理
-  Bind();
+  const auto guard = BindGuard(*this);
   // 生成纹理
   auto format = GL_RGB;
   switch (channels) {
@@ -49,7 +49,7 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
 Texture::Texture(int width, int height, enum Format format)
     : format_(format), height_(height), width_(width) {
   glGenTextures(1, &id_);
-  Bind();
+  const auto guard = BindGuard(*this);
 
   switch (format) {
     case Format::kDefault:
@@ -74,7 +74,7 @@ Texture::Texture(int width, int height, enum Format format)
 
 Texture::Texture(const std::vector<std::string> &paths) {
   glGenTextures(1, &id_);
-  Bind();
+  const auto guard = BindGuard(*this);
 
   auto channels = 0;
   stbi_set_flip_vertically_on_load(false);
@@ -129,7 +129,7 @@ enum Texture::Format Texture::Format() const { return format_; }
 unsigned int Texture::Id() const { return id_; }
 
 void Texture::SetFiltering(int operation, int method) const {
-  Bind();
+  const auto guard = BindGuard(*this);
   if (type_ == Type::kCubeMapping) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, operation, method);
   } else {
@@ -140,7 +140,7 @@ void Texture::SetFiltering(int operation, int method) const {
 void Texture::SetType(enum Type value) { type_ = value; }
 
 void Texture::SetWrap(int axis, int mode) const {
-  Bind();
+  const auto guard = BindGuard(*this);
   if (type_ == Type::kCubeMapping) {
     glTexParameteri(GL_TEXTURE_CUBE_MAP, axis, mode);
   } else {
@@ -149,3 +149,11 @@ void Texture::SetWrap(int axis, int mode) const {
 }
 
 enum Texture::Type Texture::Type() const { return type_; }
+
+void Texture::Unbind() const {
+  if (type_ == Type::kCubeMapping) {
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+  } else {
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
+}

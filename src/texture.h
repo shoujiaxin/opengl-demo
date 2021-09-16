@@ -7,7 +7,9 @@
 #include <string>
 #include <vector>
 
-class Texture final {
+#include "util/bindable.h"
+
+class Texture final : public Bindable {
  public:
   enum class Type { kDefault, kCubeMapping, kDiffuseMapping, kReflectionMapping, kSpecularMapping };
 
@@ -24,7 +26,7 @@ class Texture final {
   ~Texture();
 
   // 绑定纹理
-  void Bind() const;
+  void Bind() const override;
 
   [[nodiscard]] Format Format() const;
 
@@ -39,6 +41,8 @@ class Texture final {
   void SetWrap(int axis, int mode) const;
 
   [[nodiscard]] Type Type() const;
+
+  void Unbind() const override;
 
  private:
   enum Format format_ = Format::kDefault;

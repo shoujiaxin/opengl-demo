@@ -19,6 +19,10 @@ Program::Program(const Shader &vertex_shader, const Shader &fragment_shader) : P
 
 Program::~Program() { glDeleteProgram(id_); }
 
+void Program::BindUniformBlock(const std::string &name, int binding_point) const {
+  glUniformBlockBinding(id_, glGetUniformBlockIndex(id_, name.c_str()), binding_point);
+}
+
 void Program::Use() const { glUseProgram(id_); }
 
 void Program::AttachShader(const Shader &shader) const { glAttachShader(id_, shader.Id()); }
