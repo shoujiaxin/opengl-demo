@@ -24,13 +24,20 @@ class Buffer {
 
   void Bind() const;
 
+  // 复制缓冲内容
+  void CopyDataFrom(const Buffer& source);
+
   [[nodiscard]] unsigned int Id() const;
 
   template <class T>
   void SetData(const T* data, int size);
 
  private:
+  [[nodiscard]] GLenum BindingTarget() const;
+
   unsigned int id_ = 0;
+
+  int size_ = 0;
 
   Target target_ = Target::kArrayBuffer;
 };
@@ -47,12 +54,6 @@ Buffer::Buffer(Target target, const std::vector<T>& data)
 template <class T>
 void Buffer::SetData(const T* data, int size) {
   Bind();
-
-  switch (target_) {
-    case Target::kArrayBuffer:
-      glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
-      break;
-    default:
-      break;
-  }
+  glBufferData(BindingTarget(), size, data, GL_STATIC_DRAW);
+  size_ = size;
 }
