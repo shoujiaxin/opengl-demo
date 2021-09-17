@@ -8,8 +8,9 @@
 #include <vector>
 
 #include "interface/bindable.h"
+#include "interface/identifiable.h"
 
-class Texture final : public Bindable {
+class Texture final : public Bindable, public Identifiable<unsigned int> {
  public:
   enum class Type { kDefault, kCubeMapping, kDiffuseMapping, kReflectionMapping, kSpecularMapping };
 
@@ -30,8 +31,6 @@ class Texture final : public Bindable {
 
   [[nodiscard]] Format Format() const;
 
-  [[nodiscard]] unsigned int Id() const;
-
   // 设置过滤方式
   void SetFiltering(int operation, int method) const;
 
@@ -48,8 +47,6 @@ class Texture final : public Bindable {
   enum Format format_ = Format::kDefault;
 
   int height_ = 0;
-
-  unsigned int id_ = 0;
 
   enum Type type_ = Type::kDefault;
 

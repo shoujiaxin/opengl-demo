@@ -5,10 +5,11 @@
 #pragma once
 
 #include "interface/bindable.h"
+#include "interface/identifiable.h"
 #include "renderbuffer.h"
 #include "texture/texture.h"
 
-class Framebuffer final : public Bindable {
+class Framebuffer final : public Bindable, public Identifiable<unsigned int> {
  public:
   Framebuffer();
 
@@ -25,7 +26,4 @@ class Framebuffer final : public Bindable {
   [[nodiscard]] bool IsComplete() const;
 
   void Unbind() const override;
-
- private:
-  unsigned int id_ = 0;
 };

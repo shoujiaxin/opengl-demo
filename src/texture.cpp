@@ -126,8 +126,6 @@ void Texture::Bind() const {
 
 enum Texture::Format Texture::Format() const { return format_; }
 
-unsigned int Texture::Id() const { return id_; }
-
 void Texture::SetFiltering(int operation, int method) const {
   const auto guard = BindGuard(*this);
   if (type_ == Type::kCubeMapping) {

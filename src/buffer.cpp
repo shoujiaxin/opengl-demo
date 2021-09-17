@@ -25,8 +25,6 @@ void Buffer::CopyData(const Buffer &source) {
   size_ = source.size_;
 }
 
-unsigned int Buffer::Id() const { return id_; }
-
 void Buffer::SetData(const void *data, int size) {
   const auto guard = BindGuard(*this);
   glBufferData(target_, size, data, GL_STATIC_DRAW);

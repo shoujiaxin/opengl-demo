@@ -8,8 +8,9 @@
 
 #include "glad/glad.h"
 #include "interface/bindable.h"
+#include "interface/identifiable.h"
 
-class Buffer : public Bindable {
+class Buffer : public Bindable, public Identifiable<unsigned int> {
  public:
   explicit Buffer(GLenum target);
 
@@ -19,8 +20,6 @@ class Buffer : public Bindable {
 
   // 复制缓冲内容
   void CopyData(const Buffer& source);
-
-  [[nodiscard]] unsigned int Id() const;
 
   void SetData(const void* data, int size);
 
@@ -34,8 +33,6 @@ class Buffer : public Bindable {
   void Unbind() const override;
 
  protected:
-  unsigned int id_ = 0;
-
   int size_ = 0;
 
   GLenum target_ = 0;

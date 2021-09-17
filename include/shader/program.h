@@ -5,9 +5,10 @@
 #pragma once
 
 #include "glm/glm.hpp"
+#include "interface/identifiable.h"
 #include "shader.h"
 
-class Program final {
+class Program final : public Identifiable<unsigned int> {
  public:
   Program();
 
@@ -36,6 +37,4 @@ class Program final {
 
   // 连接着色器
   void Link() const;
-
-  unsigned int id_ = 0;
 };

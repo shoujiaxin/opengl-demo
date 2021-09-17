@@ -5,8 +5,9 @@
 #pragma once
 
 #include "interface/bindable.h"
+#include "interface/identifiable.h"
 
-class Renderbuffer final : public Bindable {
+class Renderbuffer final : public Bindable, public Identifiable<unsigned int> {
  public:
   Renderbuffer(int width, int height);
 
@@ -16,16 +17,12 @@ class Renderbuffer final : public Bindable {
 
   [[nodiscard]] int Height() const;
 
-  [[nodiscard]] unsigned int Id() const;
-
   void Unbind() const override;
 
   [[nodiscard]] int Width() const;
 
  private:
   int height_ = 0;
-
-  unsigned int id_ = 0;
 
   int width_ = 0;
 };

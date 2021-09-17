@@ -9,7 +9,7 @@
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
 
-Program::Program() : id_(glCreateProgram()) {}
+Program::Program() : Identifiable<unsigned int>(glCreateProgram()) {}
 
 Program::Program(const Shader &vertex_shader, const Shader &fragment_shader) : Program() {
   AttachShader(vertex_shader);

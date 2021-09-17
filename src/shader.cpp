@@ -8,13 +8,12 @@
 #include <iostream>
 #include <sstream>
 
-Shader::Shader(GLenum type, const std::string &path) : id_(glCreateShader(type)) {
+Shader::Shader(GLenum type, const std::string &path)
+    : Identifiable<unsigned int>(glCreateShader(type)) {
   Compile(LoadSourceFrom(path));
 }
 
 Shader::~Shader() { glDeleteShader(id_); }
-
-unsigned int Shader::Id() const { return id_; }
 
 void Shader::Compile(const std::string &source) const {
   const auto source_str = source.c_str();
