@@ -22,8 +22,14 @@ class Buffer : public Bindable {
 
   [[nodiscard]] unsigned int Id() const;
 
+  void SetData(const void* data, int size);
+
   template <class T>
-  void SetData(const T* data, int size);
+  void SetData(const std::vector<T>& data);
+
+  void SetSubData(const void* data, int size, int offset) const;
+
+  [[nodiscard]] int Size() const;
 
   void Unbind() const override;
 
@@ -36,8 +42,6 @@ class Buffer : public Bindable {
 };
 
 template <class T>
-void Buffer::SetData(const T* data, int size) {
-  const auto guard = BindGuard(*this);
-  glBufferData(target_, size, data, GL_STATIC_DRAW);
-  size_ = size;
+void Buffer::SetData(const std::vector<T>& data) {
+  SetData(&data.front(), sizeof(T) * data.size());
 }

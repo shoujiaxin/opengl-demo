@@ -44,3 +44,6 @@ target_link_libraries(Blending glfw glad assimp)
 
 add_executable(CubeMap examples/cube_map.cpp ${SOURCE_FILES})
 target_link_libraries(CubeMap glfw glad assimp)
+
+add_executable(AdvancedGLSL examples/advanced_glsl.cpp ${SOURCE_FILES})
+target_link_libraries(AdvancedGLSL glfw glad assimp)
