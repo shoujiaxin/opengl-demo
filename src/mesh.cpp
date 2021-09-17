@@ -2,7 +2,7 @@
 // Created by Jiaxin Shou on 2021/9/9.
 //
 
-#include "mesh.h"
+#include "mesh/mesh.h"
 
 #include <string>
 #include <utility>

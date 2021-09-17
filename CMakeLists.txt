@@ -23,27 +23,24 @@ include_directories(third_party/stb)
 add_subdirectory(third_party/assimp)
 include_directories(third_party/assimp/include)
 
-include_directories(include)
+include_directories(include include/*)
 
 file(GLOB SOURCE_FILES
-        src/controls.cpp
-        src/mesh.cpp
-        src/model.cpp
-        src/texture.cpp
+        src/*.cpp
         src/*/*.cpp
         )
 
-add_executable(Demo src/main.cpp ${SOURCE_FILES})
+add_executable(Demo examples/main.cpp ${SOURCE_FILES})
 target_link_libraries(Demo glfw glad assimp)
 
-add_executable(DepthTesting src/depth_testing.cpp ${SOURCE_FILES})
+add_executable(DepthTesting examples/depth_testing.cpp ${SOURCE_FILES})
 target_link_libraries(DepthTesting glfw glad assimp)
 
-add_executable(StencilTesting src/stencil_testing.cpp ${SOURCE_FILES})
+add_executable(StencilTesting examples/stencil_testing.cpp ${SOURCE_FILES})
 target_link_libraries(StencilTesting glfw glad assimp)
 
-add_executable(Blending src/blending.cpp ${SOURCE_FILES})
+add_executable(Blending examples/blending.cpp ${SOURCE_FILES})
 target_link_libraries(Blending glfw glad assimp)
 
-add_executable(CubeMap src/cube_map.cpp ${SOURCE_FILES})
+add_executable(CubeMap examples/cube_map.cpp ${SOURCE_FILES})
 target_link_libraries(CubeMap glfw glad assimp)

@@ -2,7 +2,7 @@
 // Created by Jiaxin Shou on 2021/9/10.
 //
 
-#include "model.h"
+#include "model/model.h"
 
 #include <iostream>
 

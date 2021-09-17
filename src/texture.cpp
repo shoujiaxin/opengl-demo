@@ -2,7 +2,7 @@
 // Created by Jiaxin Shou on 2021/8/22.
 //
 
-#include "texture.h"
+#include "texture/texture.h"
 
 #include <iostream>
 
