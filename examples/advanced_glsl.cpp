@@ -8,6 +8,7 @@
 
 #include "buffer/array_buffer.h"
 #include "buffer/uniform_buffer.h"
+#include "buffer/vertex_array.h"
 #include "camera/perspective_camera.h"
 #include "control/control.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -130,14 +131,10 @@ int main() {
   };
 
   // 立方体
-  unsigned int cube_vao;
-  glGenVertexArrays(1, &cube_vao);
-  glBindVertexArray(cube_vao);
+  const auto cube_vao = VertexArray();
   const auto cube_vbo = ArrayBuffer(cube_vertices);
-  cube_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-  glBindVertexArray(0);
+  cube_vao.Bind(cube_vbo);
+  cube_vao.SetAttribute(0, 3, 3 * sizeof(float), 0);
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -150,7 +147,7 @@ int main() {
     HandleKeyboardInput(window);
 
     // 清除缓冲
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     control.Update();
@@ -158,39 +155,33 @@ int main() {
     ubo.SetSubData(glm::value_ptr(camera.ViewMatrix()), sizeof(glm::mat4), 0);
     ubo.SetSubData(glm::value_ptr(camera.ProjectionMatrix()), sizeof(glm::mat4), sizeof(glm::mat4));
 
+    cube_vao.Bind();
+
     auto model_matrix = glm::mat4(1.0f);
 
     model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(-0.75f, 0.75f, 0.0f));
-    glBindVertexArray(cube_vao);
     red_program.Use();
     red_program.SetUniform("model", model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(0.75f, 0.75f, 0.0f));
-    glBindVertexArray(cube_vao);
     green_program.Use();
     green_program.SetUniform("model", model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(-0.75f, -0.75f, 0.0f));
-    glBindVertexArray(cube_vao);
     blue_program.Use();
     blue_program.SetUniform("model", model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(0.75f, -0.75f, 0.0f));
-    glBindVertexArray(cube_vao);
     yellow_program.Use();
     yellow_program.SetUniform("model", model_matrix);
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);
@@ -198,8 +189,6 @@ int main() {
     // 检查触发事件（键盘输入、鼠标移动等）
     glfwPollEvents();
   }
-
-  glDeleteVertexArrays(1, &cube_vao);
 
   glfwTerminate();
   return 0;

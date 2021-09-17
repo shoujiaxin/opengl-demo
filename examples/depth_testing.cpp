@@ -215,7 +215,7 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // 清除缓冲
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     control.Update();
@@ -249,7 +249,7 @@ int main() {
     // 使用默认帧缓冲
     framebuffer.Unbind();
     glDisable(GL_DEPTH_TEST);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // 绘制帧缓冲

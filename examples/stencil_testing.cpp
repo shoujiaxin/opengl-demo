@@ -168,7 +168,7 @@ int main() {
     HandleKeyboardInput(window);
 
     // 清除缓冲
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     control.Update();
