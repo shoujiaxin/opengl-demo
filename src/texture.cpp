@@ -4,7 +4,7 @@
 
 #include "texture/texture.h"
 
-#include <iostream>
+#include "spdlog/spdlog.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -14,9 +14,10 @@ Texture::Texture(const std::string &path, enum Type type) : Texture(type) {
   stbi_set_flip_vertically_on_load(true);
   const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
   if (data == nullptr) {
-    std::cerr << "Failed to load texture: " << path << std::endl;
+    spdlog::error("failed to load texture: {0}", path);
     return;
   }
+  spdlog::info("texture loaded: {0}", path);
 
   const auto guard = BindGuard(*this);
   auto format = GL_RGB;
@@ -75,9 +76,10 @@ Texture::Texture(const std::vector<std::string> &paths) : Texture(Type::kCubeMap
     const auto &path = paths[i];
     const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
     if (data == nullptr) {
-      std::cerr << "Failed to load texture: " << path << std::endl;
+      spdlog::error("failed to load texture: {0}", path);
       return;
     }
+    spdlog::info("texture loaded: {0}", path);
 
     auto format = GL_RGB;
     switch (channels) {

@@ -5,8 +5,9 @@
 #include "shader/shader.h"
 
 #include <fstream>
-#include <iostream>
 #include <sstream>
+
+#include "spdlog/spdlog.h"
 
 Shader::Shader(GLenum type, const std::string &path)
     : Identifiable<unsigned int>(glCreateShader(type)) {
@@ -25,17 +26,18 @@ void Shader::Compile(const std::string &source) const {
   glGetShaderiv(id_, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(id_, 512, nullptr, info_log);
-    std::cerr << "Failed to compile shader: " << info_log << std::endl;
+    spdlog::error("failed to compile shader: {0}", info_log);
   }
 }
 
 std::string Shader::LoadSourceFrom(const std::string &path) {
   auto file = std::ifstream(path);
   if (file.fail()) {
-    std::cerr << "File not found: " << path << std::endl;
+    spdlog::error("failed to load shader source: {0}", path);
     return "";
   }
   std::stringstream stream;
   stream << file.rdbuf();
+  spdlog::info("shader source loaded: {0}", path);
   return stream.str();
 }

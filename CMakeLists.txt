@@ -23,6 +23,9 @@ include_directories(third_party/stb)
 add_subdirectory(third_party/assimp)
 include_directories(third_party/assimp/include)
 
+# spdlog
+add_subdirectory(third_party/spdlog)
+
 include_directories(include include/*)
 
 file(GLOB SOURCE_FILES
@@ -31,19 +34,19 @@ file(GLOB SOURCE_FILES
         )
 
 add_executable(Demo examples/main.cpp ${SOURCE_FILES})
-target_link_libraries(Demo glfw glad assimp)
+target_link_libraries(Demo glfw glad assimp spdlog)
 
 add_executable(DepthTesting examples/depth_testing.cpp ${SOURCE_FILES})
-target_link_libraries(DepthTesting glfw glad assimp)
+target_link_libraries(DepthTesting glfw glad assimp spdlog)
 
 add_executable(StencilTesting examples/stencil_testing.cpp ${SOURCE_FILES})
-target_link_libraries(StencilTesting glfw glad assimp)
+target_link_libraries(StencilTesting glfw glad assimp spdlog)
 
 add_executable(Blending examples/blending.cpp ${SOURCE_FILES})
-target_link_libraries(Blending glfw glad assimp)
+target_link_libraries(Blending glfw glad assimp spdlog)
 
 add_executable(CubeMap examples/cube_map.cpp ${SOURCE_FILES})
-target_link_libraries(CubeMap glfw glad assimp)
+target_link_libraries(CubeMap glfw glad assimp spdlog)
 
 add_executable(AdvancedGLSL examples/advanced_glsl.cpp ${SOURCE_FILES})
-target_link_libraries(AdvancedGLSL glfw glad assimp)
+target_link_libraries(AdvancedGLSL glfw glad assimp spdlog)

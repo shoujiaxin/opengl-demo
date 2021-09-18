@@ -4,10 +4,9 @@
 
 #include "model/model.h"
 
-#include <iostream>
-
 #include "assimp/Importer.hpp"
 #include "assimp/postprocess.h"
+#include "spdlog/spdlog.h"
 
 Model::Model(const std::string &path) {
   directory_ = path.substr(0, path.find_last_of('/'));
@@ -23,7 +22,7 @@ void Model::Draw(const Program &program) const {
 
   const auto error = glGetError();
   if (error != GL_NO_ERROR) {
-    std::cerr << "OpenGL Error: " << error << std::endl;
+    spdlog::error("OpenGL error: {0}", error);
   }
 }
 
@@ -71,8 +70,7 @@ void Model::LoadModelFrom(const std::string &path) {
   const auto scene = importer.ReadFile(path, aiProcess_Triangulate);
 
   if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-    std::cerr << "Failed to load model: " << path << std::endl;
-    std::cerr << importer.GetErrorString() << std::endl;
+    spdlog::error("failed to load model: {0}\n{1}", path, importer.GetErrorString());
     return;
   }
 

@@ -4,10 +4,9 @@
 
 #include "shader/program.h"
 
-#include <iostream>
-
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "spdlog/spdlog.h"
 
 Program::Program() : Identifiable<unsigned int>(glCreateProgram()) {}
 
@@ -61,6 +60,8 @@ void Program::Link() const {
   glGetProgramiv(id_, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id_, 512, nullptr, info_log);
-    std::cerr << "Failed to link program: " << info_log << std::endl;
+    spdlog::error("failed to link program: {0}", info_log);
+  } else {
+    spdlog::info("program linked, ID: {0}", id_);
   }
 }
