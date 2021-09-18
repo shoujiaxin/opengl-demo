@@ -2,11 +2,7 @@
 
 struct Material {
     sampler2D texture_diffuse1;
-    sampler2D texture_diffuse2;
-    sampler2D texture_specular1;
-    sampler2D texture_specular2;
     sampler2D texture_reflection1;
-    sampler2D texture_reflection2;
 };
 
 in vec3 FragPos;

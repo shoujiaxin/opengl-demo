@@ -48,8 +48,6 @@ void Mesh::Draw(const Program &program) const {
     program.SetUniform("material." + name, static_cast<int>(texture->Id()));
   }
 
-  glActiveTexture(GL_TEXTURE0);
-
   // 绘制
   glBindVertexArray(vertex_array_object_);
   glDrawElements(GL_TRIANGLES, static_cast<int>(indices_.size()), GL_UNSIGNED_INT, nullptr);
