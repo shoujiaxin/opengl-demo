@@ -16,9 +16,9 @@ class UniformBuffer final : public Buffer {
     size_ = size;
   }
 
-  void Bind(int binding_point) const { glBindBufferBase(target_, binding_point, id_); }
+  void BindTo(int binding_point) const { glBindBufferBase(target_, binding_point, id_); }
 
-  void Bind(int binding_point, int offset, int size) const {
+  void BindTo(int binding_point, int offset, int size) const {
     glBindBufferRange(target_, binding_point, id_, offset, size);
   }
 };

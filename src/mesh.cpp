@@ -42,9 +42,10 @@ void Mesh::Draw(const Program &program) const {
         break;
     }
 
+    // 绑定纹理到纹理单元
+    texture->BindToUnit(static_cast<int>(texture->Id()));
+    // 将纹理单元设置给采样器
     program.SetUniform("material." + name, static_cast<int>(texture->Id()));
-    glActiveTexture(GL_TEXTURE0 + texture->Id());
-    texture->Bind();
   }
 
   glActiveTexture(GL_TEXTURE0);

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "buffer/array_buffer.h"
+#include "buffer/vertex_array.h"
 #include "camera/perspective_camera.h"
 #include "control/control.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -66,6 +67,8 @@ int main() {
 
   const auto program = Program(VertexShader("../shaders/vertex_shaders/depth_testing.vert"),
                                FragmentShader("../shaders/fragment_shaders/blending.frag"));
+  // 使用 GL_TEXTURE0 纹理单元，渲染时将不同的纹理绑定到该单元
+  program.SetUniform("texture1", 0);
 
   const auto cube_vertices = std::vector<float>{
       // ----- 位置 -----, --- 纹理坐标 ---
@@ -138,43 +141,25 @@ int main() {
                                                      {0.5f, 0.0f, -0.6f}};
 
   // 立方体
-  unsigned int cube_vao;
-  glGenVertexArrays(1, &cube_vao);
-  glBindVertexArray(cube_vao);
+  const auto cube_vao = VertexArray();
   const auto cube_vbo = ArrayBuffer(cube_vertices);
-  cube_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        reinterpret_cast<void*>(3 * sizeof(float)));
-  glBindVertexArray(0);
+  cube_vao.Bind(cube_vbo);
+  cube_vao.SetAttribute(0, 3, 5 * sizeof(float), 0);
+  cube_vao.SetAttribute(1, 2, 5 * sizeof(float), 3 * sizeof(float));
 
   // 平面
-  unsigned int plane_vao;
-  glGenVertexArrays(1, &plane_vao);
-  glBindVertexArray(plane_vao);
+  const auto plane_vao = VertexArray();
   const auto plane_vbo = ArrayBuffer(plane_vertices);
-  plane_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        reinterpret_cast<void*>(3 * sizeof(float)));
-  glBindVertexArray(0);
+  plane_vao.Bind(plane_vbo);
+  plane_vao.SetAttribute(0, 3, 5 * sizeof(float), 0);
+  plane_vao.SetAttribute(1, 2, 5 * sizeof(float), 3 * sizeof(float));
 
   // 透明纹理
-  unsigned int vegetation_vao;
-  glGenVertexArrays(1, &vegetation_vao);
-  glBindVertexArray(vegetation_vao);
+  const auto vegetation_vao = VertexArray();
   const auto vegetation_vbo = ArrayBuffer(transparent_vertices);
-  vegetation_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                        reinterpret_cast<void*>(3 * sizeof(float)));
-  glBindVertexArray(0);
+  vegetation_vao.Bind(vegetation_vbo);
+  vegetation_vao.SetAttribute(0, 3, 5 * sizeof(float), 0);
+  vegetation_vao.SetAttribute(1, 2, 5 * sizeof(float), 3 * sizeof(float));
 
   const auto cube_texture = Texture("../assets/textures/marble.jpg");
   const auto floor_texture = Texture("../assets/textures/metal.png");
@@ -183,9 +168,6 @@ int main() {
   const auto grass_texture = Texture("../assets/textures/window.png");
   grass_texture.SetWrap(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   grass_texture.SetWrap(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  program.Use();
-  program.SetUniform("texture1", 0);
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -210,9 +192,8 @@ int main() {
     auto model_matrix = glm::mat4(1.0f);
 
     // 绘制立方体
-    glBindVertexArray(cube_vao);
-    glActiveTexture(GL_TEXTURE0);
-    cube_texture.Bind();
+    cube_vao.Bind();
+    cube_texture.BindToUnit(0);
     model_matrix = glm::mat4(1.0f);
     // Y 轴加 0.001 偏移，避免 Z-fighting 问题
     program.SetUniform("model", glm::translate(model_matrix, glm::vec3(-1.0f, 0.001f, -1.0f)));
@@ -220,14 +201,12 @@ int main() {
     model_matrix = glm::mat4(1.0f);
     program.SetUniform("model", glm::translate(model_matrix, glm::vec3(2.0f, 0.001f, 0.0f)));
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
     // 绘制平面
-    glBindVertexArray(plane_vao);
-    floor_texture.Bind();
+    plane_vao.Bind();
+    floor_texture.BindToUnit(0);
     program.SetUniform("model", glm::mat4(1.0f));
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
 
     // 排序透明物体，先绘制最远的
     std::sort(vegetation_positions.begin(), vegetation_positions.end(),
@@ -236,8 +215,8 @@ int main() {
               });
 
     // 绘制透明纹理
-    glBindVertexArray(vegetation_vao);
-    grass_texture.Bind();
+    vegetation_vao.Bind();
+    grass_texture.BindToUnit(0);
     for (const auto& position : vegetation_positions) {
       model_matrix = glm::mat4(1.0f);
       model_matrix = glm::translate(model_matrix, position);
@@ -251,10 +230,6 @@ int main() {
     // 检查触发事件（键盘输入、鼠标移动等）
     glfwPollEvents();
   }
-
-  glDeleteVertexArrays(1, &cube_vao);
-  glDeleteVertexArrays(1, &plane_vao);
-  glDeleteVertexArrays(1, &vegetation_vao);
 
   glfwTerminate();
   return 0;

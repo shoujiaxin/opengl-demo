@@ -6,12 +6,10 @@
 
 #include <iostream>
 
-#include "glad/glad.h"
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-Texture::Texture(const std::string &path, enum Type type) : type_(type) {
+Texture::Texture(const std::string &path, enum Type type) : Texture(type) {
   auto channels = 0;
   stbi_set_flip_vertically_on_load(true);
   const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
@@ -20,11 +18,7 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
     return;
   }
 
-  // 创建纹理
-  glGenTextures(1, &id_);
-  // 绑定纹理
   const auto guard = BindGuard(*this);
-  // 生成纹理
   auto format = GL_RGB;
   switch (channels) {
     case 1:
@@ -47,7 +41,7 @@ Texture::Texture(const std::string &path, enum Type type) : type_(type) {
 }
 
 Texture::Texture(int width, int height, enum Format format)
-    : format_(format), height_(height), width_(width) {
+    : format_(format), height_(height), type_(Type::kDefault), width_(width) {
   glGenTextures(1, &id_);
   const auto guard = BindGuard(*this);
 
@@ -72,8 +66,7 @@ Texture::Texture(int width, int height, enum Format format)
   }
 }
 
-Texture::Texture(const std::vector<std::string> &paths) {
-  glGenTextures(1, &id_);
+Texture::Texture(const std::vector<std::string> &paths) : Texture(Type::kCubeMapping) {
   const auto guard = BindGuard(*this);
 
   auto channels = 0;
@@ -116,42 +109,39 @@ Texture::Texture(const std::vector<std::string> &paths) {
 
 Texture::~Texture() { glDeleteTextures(1, &id_); }
 
-void Texture::Bind() const {
-  if (type_ == Type::kCubeMapping) {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, id_);
-  } else {
-    glBindTexture(GL_TEXTURE_2D, id_);
-  }
+void Texture::Bind() const { glBindTexture(Target(), id_); }
+
+void Texture::BindToUnit(int index) const {
+  glActiveTexture(GL_TEXTURE0 + index);
+  Bind();
+  glActiveTexture(GL_TEXTURE0);
 }
 
 enum Texture::Format Texture::Format() const { return format_; }
 
 void Texture::SetFiltering(int operation, int method) const {
   const auto guard = BindGuard(*this);
-  if (type_ == Type::kCubeMapping) {
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, operation, method);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, operation, method);
-  }
+  glTexParameteri(Target(), operation, method);
 }
 
 void Texture::SetType(enum Type value) { type_ = value; }
 
 void Texture::SetWrap(int axis, int mode) const {
   const auto guard = BindGuard(*this);
-  if (type_ == Type::kCubeMapping) {
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, axis, mode);
-  } else {
-    glTexParameteri(GL_TEXTURE_2D, axis, mode);
-  }
+  glTexParameteri(Target(), axis, mode);
 }
 
 enum Texture::Type Texture::Type() const { return type_; }
 
-void Texture::Unbind() const {
-  if (type_ == Type::kCubeMapping) {
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-  } else {
-    glBindTexture(GL_TEXTURE_2D, 0);
+void Texture::Unbind() const { glBindTexture(Target(), 0); }
+
+Texture::Texture(enum Type type) : type_(type) { glGenTextures(1, &id_); }
+
+GLenum Texture::Target() const {
+  switch (type_) {
+    case Type::kCubeMapping:
+      return GL_TEXTURE_CUBE_MAP;
+    default:
+      return GL_TEXTURE_2D;
   }
 }

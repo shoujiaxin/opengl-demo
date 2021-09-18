@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "buffer/array_buffer.h"
+#include "buffer/vertex_array.h"
 #include "camera/perspective_camera.h"
 #include "control/control.h"
 #include "glm/gtc/matrix_transform.hpp"
@@ -63,18 +64,6 @@ int main() {
   glEnable(GL_CULL_FACE);
   //  glCullFace(GL_FRONT);  // 需要剔除的面
   //  glFrontFace(GL_CW);    // 需要剔除面的方向
-
-  // 加载天空盒
-  const auto skybox_texture = Texture({
-      // 按照枚举顺序
-      "../assets/textures/skybox/right.jpg",   //
-      "../assets/textures/skybox/left.jpg",    //
-      "../assets/textures/skybox/top.jpg",     //
-      "../assets/textures/skybox/bottom.jpg",  //
-      "../assets/textures/skybox/front.jpg",   //
-      "../assets/textures/skybox/back.jpg"     //
-  });
-  const auto cube_texture = Texture("../assets/textures/container.jpg");
 
   // 天空盒顶点
   const auto skybox_vertices =
@@ -142,38 +131,44 @@ int main() {
   };
 
   // 天空盒
-  unsigned int skybox_vao;
-  glGenVertexArrays(1, &skybox_vao);
-  glBindVertexArray(skybox_vao);
+  const auto skybox_vao = VertexArray();
   const auto skybox_vbo = ArrayBuffer(skybox_vertices);
-  skybox_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-  glBindVertexArray(0);
+  skybox_vao.Bind(skybox_vbo);
+  skybox_vao.SetAttribute(0, 3, 3 * sizeof(float), 0);
 
   // 立方体
-  unsigned int cube_vao;
-  glGenVertexArrays(1, &cube_vao);
-  glBindVertexArray(cube_vao);
+  const auto cube_vao = VertexArray();
   const auto cube_vbo = ArrayBuffer(cube_vertices);
-  cube_vbo.Bind();
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), nullptr);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float),
-                        reinterpret_cast<void*>(3 * sizeof(float)));
-  glBindVertexArray(0);
+  cube_vao.Bind(cube_vbo);
+  cube_vao.SetAttribute(0, 3, 6 * sizeof(float), 0);
+  cube_vao.SetAttribute(1, 3, 6 * sizeof(float), 3 * sizeof(float));
 
-  // 模型
-  const auto model = Model("../assets/models/nanosuit/nanosuit.obj");
-
+  // 着色器程序
   const auto skybox_program = Program(VertexShader("../shaders/vertex_shaders/skybox.vert"),
                                       FragmentShader("../shaders/fragment_shaders/skybox.frag"));
-  const auto program = Program(VertexShader("../shaders/vertex_shaders/reflection.vert"),
-                               FragmentShader("../shaders/fragment_shaders/refraction.frag"));
+  skybox_program.SetUniform("skybox", 0);
+  const auto cube_program = Program(VertexShader("../shaders/vertex_shaders/reflection.vert"),
+                                    FragmentShader("../shaders/fragment_shaders/refraction.frag"));
+  cube_program.SetUniform("skybox", 0);
   const auto model_program =
       Program(VertexShader("../shaders/vertex_shaders/multiple_lights.vert"),
               FragmentShader("../shaders/fragment_shaders/model_reflection.frag"));
+  model_program.SetUniform("skybox", 0);
+
+  // 纹理
+  const auto skybox_texture = Texture({
+      // 按照枚举顺序
+      "../assets/textures/skybox/right.jpg",   //
+      "../assets/textures/skybox/left.jpg",    //
+      "../assets/textures/skybox/top.jpg",     //
+      "../assets/textures/skybox/bottom.jpg",  //
+      "../assets/textures/skybox/front.jpg",   //
+      "../assets/textures/skybox/back.jpg"     //
+  });
+  const auto cube_texture = Texture("../assets/textures/container.jpg");
+
+  // 模型
+  const auto model = Model("../assets/models/nanosuit/nanosuit.obj");
 
   // 相机
   auto camera = PerspectiveCamera(45.0f, static_cast<float>(SCR_WIDTH) / SCR_HEIGHT, 0.1f, 100.0f);
@@ -191,46 +186,39 @@ int main() {
 
     control.Update();
 
-    skybox_program.Use();
     // 移除矩阵位移部分
     skybox_program.SetUniform("view", glm::mat4(glm::mat3(camera.ViewMatrix())));
     skybox_program.SetUniform("projection", camera.ProjectionMatrix());
 
-    program.Use();
-    program.SetUniform("view", camera.ViewMatrix());
-    program.SetUniform("model", glm::mat4(1.0f));
-    program.SetUniform("projection", camera.ProjectionMatrix());
-    program.SetUniform("cameraPos", camera.Position());
+    cube_program.SetUniform("view", camera.ViewMatrix());
+    cube_program.SetUniform("model", glm::mat4(1.0f));
+    cube_program.SetUniform("projection", camera.ProjectionMatrix());
+    cube_program.SetUniform("cameraPos", camera.Position());
+
+    model_program.SetUniform("view", camera.ViewMatrix());
+    model_program.SetUniform("projection", camera.ProjectionMatrix());
+    model_program.SetUniform("viewPos", camera.Position());
+
+    // 绑定纹理
+    skybox_texture.BindToUnit(0);
 
     // 绘制天空盒
     glDepthMask(GL_FALSE);
     skybox_program.Use();
-    glBindVertexArray(skybox_vao);
-    skybox_program.SetUniform("skybox", 0);
-    glActiveTexture(GL_TEXTURE0);
-    skybox_texture.Bind();
+    skybox_vao.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
     glDepthMask(GL_TRUE);
 
     // 绘制立方体
-    program.Use();
-    glBindVertexArray(cube_vao);
-    //    cube_texture.Bind();
+    cube_program.Use();
+    cube_vao.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
-    glBindVertexArray(0);
 
+    // 绘制模型
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, -0.5f, 0.0f));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
-    model_program.Use();
-    model_program.SetUniform("view", camera.ViewMatrix());
     model_program.SetUniform("model", model_matrix);
-    model_program.SetUniform("projection", camera.ProjectionMatrix());
-    model_program.SetUniform("viewPos", camera.Position());
-    model_program.SetUniform("skybox", 1);
-    glActiveTexture(GL_TEXTURE1);
-    skybox_texture.Bind();
     model.Draw(model_program);
 
     // 交换颜色缓冲
@@ -239,9 +227,6 @@ int main() {
     // 检查触发事件（键盘输入、鼠标移动等）
     glfwPollEvents();
   }
-
-  glDeleteVertexArrays(1, &skybox_vao);
-  glDeleteVertexArrays(1, &cube_vao);
 
   glfwTerminate();
   return 0;

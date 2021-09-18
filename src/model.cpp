@@ -16,8 +16,14 @@ Model::Model(const std::string &path) {
 }
 
 void Model::Draw(const Program &program) const {
+  program.Use();
   for (const auto &mesh : meshes_) {
     mesh->Draw(program);
+  }
+
+  const auto error = glGetError();
+  if (error != GL_NO_ERROR) {
+    std::cerr << "OpenGL Error: " << error << std::endl;
   }
 }
 

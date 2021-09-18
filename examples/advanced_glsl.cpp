@@ -63,27 +63,23 @@ int main() {
 
   const auto red_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
                                    FragmentShader("../shaders/fragment_shaders/color2.frag"));
-  red_program.Use();
   red_program.SetUniform("ourColor", glm::vec3(1.0f, 0.0f, 0.0f));
   red_program.BindUniformBlock("Matrices", 0);
   const auto green_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
                                      FragmentShader("../shaders/fragment_shaders/color2.frag"));
-  green_program.Use();
   green_program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
   green_program.BindUniformBlock("Matrices", 0);
   const auto blue_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
                                     FragmentShader("../shaders/fragment_shaders/color2.frag"));
-  blue_program.Use();
   blue_program.SetUniform("ourColor", glm::vec3(0.0f, 0.0f, 1.0f));
   blue_program.BindUniformBlock("Matrices", 0);
   const auto yellow_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
                                       FragmentShader("../shaders/fragment_shaders/color2.frag"));
-  yellow_program.Use();
   yellow_program.SetUniform("ourColor", glm::vec3(1.0f, 1.0f, 0.0f));
   yellow_program.BindUniformBlock("Matrices", 0);
 
   const auto ubo = UniformBuffer(2 * sizeof(glm::mat4));
-  ubo.Bind(0, 0, ubo.Size());
+  ubo.BindTo(0, 0, ubo.Size());
 
   const auto cube_vertices = std::vector<float>{
       // ----- 位置 -----
@@ -155,7 +151,7 @@ int main() {
     ubo.SetSubData(glm::value_ptr(camera.ViewMatrix()), sizeof(glm::mat4), 0);
     ubo.SetSubData(glm::value_ptr(camera.ProjectionMatrix()), sizeof(glm::mat4), sizeof(glm::mat4));
 
-    cube_vao.Bind();
+    const auto guard = BindGuard(cube_vao);
 
     auto model_matrix = glm::mat4(1.0f);
 

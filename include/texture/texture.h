@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 
+#include "glad/glad.h"
 #include "interface/bindable.h"
 #include "interface/identifiable.h"
 
@@ -29,6 +30,9 @@ class Texture final : public Bindable, public Identifiable<unsigned int> {
   // 绑定纹理
   void Bind() const override;
 
+  // 绑定到指定纹理单元
+  void BindToUnit(int index) const;
+
   [[nodiscard]] Format Format() const;
 
   // 设置过滤方式
@@ -44,6 +48,10 @@ class Texture final : public Bindable, public Identifiable<unsigned int> {
   void Unbind() const override;
 
  private:
+  explicit Texture(enum Type type);
+
+  [[nodiscard]] GLenum Target() const;
+
   enum Format format_ = Format::kDefault;
 
   int height_ = 0;
