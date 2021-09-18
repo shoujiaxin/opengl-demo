@@ -7,6 +7,9 @@
 #include <memory>
 #include <vector>
 
+#include "buffer/array_buffer.h"
+#include "buffer/element_array_buffer.h"
+#include "buffer/vertex_array.h"
 #include "glm/glm.hpp"
 #include "shader/program.h"
 #include "texture/texture.h"
@@ -27,15 +30,11 @@ class Mesh final {
   Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
        std::vector<std::shared_ptr<Texture>> textures);
 
-  ~Mesh();
-
   void Draw(const Program& program) const;
 
  private:
-  void Setup();
-
-  // 索引缓冲对象
-  unsigned int element_buffer_object_ = 0;
+  // 顶点
+  std::vector<Vertex> vertices_ = {};
 
   // 索引
   std::vector<unsigned int> indices_ = {};
@@ -43,12 +42,12 @@ class Mesh final {
   // 纹理
   std::vector<std::shared_ptr<Texture>> textures_ = {};
 
-  // 顶点
-  std::vector<Vertex> vertices_ = {};
-
   // 顶点数组对象
-  unsigned int vertex_array_object_ = 0;
+  std::shared_ptr<VertexArray> vertex_array_object_ = nullptr;
 
   // 顶点缓冲对象
-  unsigned int vertex_buffer_object_ = 0;
+  std::shared_ptr<ArrayBuffer> vertex_buffer_object_ = nullptr;
+
+  // 索引缓冲对象
+  std::shared_ptr<ElementArrayBuffer> element_buffer_object_ = nullptr;
 };
