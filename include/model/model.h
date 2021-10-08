@@ -17,6 +17,8 @@ class Model final {
  public:
   explicit Model(const std::string& path);
 
+  ~Model();
+
   void Draw(const Program& program) const;
 
  private:
@@ -25,14 +27,14 @@ class Model final {
 
   void LoadModelFrom(const std::string& path);
 
-  std::shared_ptr<Mesh> ProcessMesh(const aiScene* scene, const aiMesh* mesh);
+  std::unique_ptr<Mesh> ProcessMesh(const aiScene* scene, const aiMesh* mesh);
 
   void ProcessNode(const aiScene* scene, const aiNode* node);
 
   std::string directory_;
 
-  std::vector<std::shared_ptr<Mesh>> meshes_;
+  std::vector<std::unique_ptr<Mesh>> meshes_;
 
   // 纹理缓存
-  static std::unordered_map<std::string, std::shared_ptr<Texture>> texture_cache_;
+  static std::unordered_map<std::string, std::weak_ptr<Texture>> texture_cache_;
 };

@@ -4,7 +4,12 @@
 
 #include "buffer/buffer.h"
 
-Buffer::Buffer(GLenum target) : target_(target) { glGenBuffers(1, &id_); }
+#include "spdlog/spdlog.h"
+
+Buffer::Buffer(GLenum target) : target_(target) {
+  glGenBuffers(1, &id_);
+  spdlog::info("buffer (id = {0}) generated, target: 0x{1:x}", id_, target_);
+}
 
 Buffer::~Buffer() { glDeleteBuffers(1, &id_); }
 

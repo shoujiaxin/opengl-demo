@@ -43,11 +43,11 @@ class Mesh final {
   std::vector<std::shared_ptr<Texture>> textures_ = {};
 
   // 顶点数组对象
-  std::shared_ptr<VertexArray> vertex_array_object_ = nullptr;
+  std::unique_ptr<VertexArray> vertex_array_object_ = nullptr;
 
   // 顶点缓冲对象
-  std::shared_ptr<ArrayBuffer> vertex_buffer_object_ = nullptr;
+  std::unique_ptr<ArrayBuffer> vertex_buffer_object_ = nullptr;
 
   // 索引缓冲对象
-  std::shared_ptr<ElementArrayBuffer> element_buffer_object_ = nullptr;
+  std::unique_ptr<ElementArrayBuffer> element_buffer_object_ = nullptr;
 };

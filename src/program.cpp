@@ -60,8 +60,8 @@ void Program::Link() const {
   glGetProgramiv(id_, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(id_, 512, nullptr, info_log);
-    spdlog::error("failed to link program: {0}", info_log);
+    spdlog::error("failed to link program (id = {0}): {1}", id_, info_log);
   } else {
-    spdlog::info("program linked, ID: {0}", id_);
+    spdlog::info("program (id = {0}) linked", id_);
   }
 }

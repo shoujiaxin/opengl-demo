@@ -14,9 +14,9 @@ Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices,
     : vertices_(std::move(vertices)),
       indices_(std::move(indices)),
       textures_(std::move(textures)),
-      vertex_array_object_(std::make_shared<VertexArray>()),
-      vertex_buffer_object_(std::make_shared<ArrayBuffer>(vertices_)),
-      element_buffer_object_(std::make_shared<ElementArrayBuffer>(indices_)) {
+      vertex_array_object_(std::make_unique<VertexArray>()),
+      vertex_buffer_object_(std::make_unique<ArrayBuffer>(vertices_)),
+      element_buffer_object_(std::make_unique<ElementArrayBuffer>(indices_)) {
   const auto guard = BindGuard(*vertex_array_object_);
 
   vertex_array_object_->Bind(*vertex_buffer_object_);

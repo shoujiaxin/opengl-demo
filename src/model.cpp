@@ -14,6 +14,18 @@ Model::Model(const std::string &path) {
   LoadModelFrom(path);
 }
 
+Model::~Model() {
+  // 释放缓存
+  meshes_.clear();
+  for (auto it = texture_cache_.begin(); it != texture_cache_.end();) {
+    if (it->second.expired()) {
+      it = texture_cache_.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
 void Model::Draw(const Program &program) const {
   program.Use();
   for (const auto &mesh : meshes_) {
@@ -56,9 +68,10 @@ std::vector<std::shared_ptr<Texture>> Model::LoadMaterialTextures(const aiMateri
 
     if (texture_cache_.find(texture_path) == texture_cache_.cend()) {
       textures.emplace_back(std::make_shared<Texture>(texture_path, texture_type));
-      texture_cache_.insert({texture_path, textures.back()});
+      texture_cache_[texture_path] = textures.back();
     } else {
-      textures.push_back(texture_cache_[texture_path]);
+      textures.push_back(texture_cache_[texture_path].lock());
+      spdlog::info("texture loaded from cache: {0}", texture_path);
     }
   }
 
@@ -77,7 +90,7 @@ void Model::LoadModelFrom(const std::string &path) {
   ProcessNode(scene, scene->mRootNode);
 }
 
-std::shared_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mesh) {
+std::unique_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mesh) {
   std::vector<Vertex> vertices;
   std::vector<unsigned int> indices;
   std::vector<std::shared_ptr<Texture>> textures;
@@ -116,24 +129,27 @@ std::shared_ptr<Mesh> Model::ProcessMesh(const aiScene *scene, const aiMesh *mes
 
     // 漫反射贴图
     const auto diffuse_maps = LoadMaterialTextures(material, aiTextureType_DIFFUSE);
-    textures.insert(textures.end(), diffuse_maps.cbegin(), diffuse_maps.cend());
+    textures.insert(textures.end(), std::make_move_iterator(diffuse_maps.cbegin()),
+                    std::make_move_iterator(diffuse_maps.cend()));
 
     // 镜面光贴图
     const auto specular_maps = LoadMaterialTextures(material, aiTextureType_SPECULAR);
-    textures.insert(textures.end(), specular_maps.cbegin(), specular_maps.cend());
+    textures.insert(textures.end(), std::make_move_iterator(specular_maps.cbegin()),
+                    std::make_move_iterator(specular_maps.cend()));
 
     // 反射贴图
     const auto reflection_maps = LoadMaterialTextures(material, aiTextureType_AMBIENT);
-    textures.insert(textures.end(), reflection_maps.cbegin(), reflection_maps.cend());
+    textures.insert(textures.end(), std::make_move_iterator(reflection_maps.cbegin()),
+                    std::make_move_iterator(reflection_maps.cend()));
   }
 
-  return std::make_shared<Mesh>(vertices, indices, textures);
+  return std::make_unique<Mesh>(vertices, indices, textures);
 }
 
 void Model::ProcessNode(const aiScene *scene, const aiNode *node) {
   for (auto i = 0; i < node->mNumMeshes; ++i) {
     const auto mesh = scene->mMeshes[node->mMeshes[i]];
-    meshes_.emplace_back(std::move(ProcessMesh(scene, mesh)));
+    meshes_.emplace_back(ProcessMesh(scene, mesh));
   }
 
   for (auto i = 0; i < node->mNumChildren; ++i) {
@@ -141,4 +157,4 @@ void Model::ProcessNode(const aiScene *scene, const aiNode *node) {
   }
 }
 
-std::unordered_map<std::string, std::shared_ptr<Texture>> Model::texture_cache_{};
+std::unordered_map<std::string, std::weak_ptr<Texture>> Model::texture_cache_{};

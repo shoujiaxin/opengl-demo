@@ -26,7 +26,7 @@ void Shader::Compile(const std::string &source) const {
   glGetShaderiv(id_, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(id_, 512, nullptr, info_log);
-    spdlog::error("failed to compile shader: {0}", info_log);
+    spdlog::error("failed to compile shader (id = {0}): {1}", id_, info_log);
   }
 }
 

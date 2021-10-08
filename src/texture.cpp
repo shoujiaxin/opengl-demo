@@ -14,10 +14,10 @@ Texture::Texture(const std::string &path, enum Type type) : Texture(type) {
   stbi_set_flip_vertically_on_load(true);
   const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
   if (data == nullptr) {
-    spdlog::error("failed to load texture: {0}", path);
+    spdlog::error("failed to load texture (id = {0}): {1}", id_, path);
     return;
   }
-  spdlog::info("texture loaded: {0}", path);
+  spdlog::info("texture (id = {0}) loaded: {1}", id_, path);
 
   const auto guard = BindGuard(*this);
   auto format = GL_RGB;
@@ -76,10 +76,10 @@ Texture::Texture(const std::vector<std::string> &paths) : Texture(Type::kCubeMap
     const auto &path = paths[i];
     const auto data = stbi_load(path.c_str(), &width_, &height_, &channels, 0);
     if (data == nullptr) {
-      spdlog::error("failed to load texture: {0}", path);
+      spdlog::error("failed to load cube map texture (id = {0}): {1}", id_, path);
       return;
     }
-    spdlog::info("texture loaded: {0}", path);
+    spdlog::info("cube map texture (id = {0}) loaded: {1}", id_, path);
 
     auto format = GL_RGB;
     switch (channels) {
