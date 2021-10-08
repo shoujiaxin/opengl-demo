@@ -4,9 +4,10 @@
 
 #pragma once
 
+#include "fragment_shader.h"
 #include "glm/glm.hpp"
 #include "interface/identifiable.h"
-#include "shader.h"
+#include "vertex_shader.h"
 
 class Program final : public Identifiable<unsigned int> {
  public:
@@ -16,7 +17,13 @@ class Program final : public Identifiable<unsigned int> {
 
   ~Program();
 
+  // 添加着色器
+  void AttachShader(const Shader& shader) const;
+
   void BindUniformBlock(const std::string& name, int binding_point) const;
+
+  // 连接着色器
+  void Link() const;
 
   void SetUniform(const std::string& name, bool value) const;
 
@@ -30,11 +37,4 @@ class Program final : public Identifiable<unsigned int> {
 
   // 使用着色器程序
   void Use() const;
-
- private:
-  // 添加着色器
-  void AttachShader(const Shader& shader) const;
-
-  // 连接着色器
-  void Link() const;
 };

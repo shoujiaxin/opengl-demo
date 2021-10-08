@@ -8,7 +8,7 @@
 
 class ElementArrayBuffer final : public Buffer {
  public:
-  ElementArrayBuffer() : Buffer(GL_ELEMENT_ARRAY_BUFFER){};
+  ElementArrayBuffer() : Buffer(GL_ELEMENT_ARRAY_BUFFER) {}
 
   template <class T>
   explicit ElementArrayBuffer(const std::vector<T>& data)

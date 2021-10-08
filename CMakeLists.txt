@@ -50,3 +50,6 @@ target_link_libraries(CubeMap glfw glad assimp spdlog)
 
 add_executable(AdvancedGLSL examples/advanced_glsl.cpp ${SOURCE_FILES})
 target_link_libraries(AdvancedGLSL glfw glad assimp spdlog)
+
+add_executable(GeometryShader examples/geometry_shader_demo.cpp ${SOURCE_FILES})
+target_link_libraries(GeometryShader glfw glad assimp spdlog)

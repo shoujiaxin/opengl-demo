@@ -8,7 +8,7 @@
 
 class ArrayBuffer final : public Buffer {
  public:
-  ArrayBuffer() : Buffer(GL_ARRAY_BUFFER){};
+  ArrayBuffer() : Buffer(GL_ARRAY_BUFFER) {}
 
   template <class T>
   explicit ArrayBuffer(const std::vector<T>& data)

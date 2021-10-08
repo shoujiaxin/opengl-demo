@@ -22,13 +22,3 @@ class Shader : public Identifiable<unsigned int> {
   // 读取着色器 GLSL 文件
   static std::string LoadSourceFrom(const std::string& path);
 };
-
-class FragmentShader final : public Shader {
- public:
-  explicit FragmentShader(const std::string& path) : Shader(GL_FRAGMENT_SHADER, path){};
-};
-
-class VertexShader final : public Shader {
- public:
-  explicit VertexShader(const std::string& path) : Shader(GL_VERTEX_SHADER, path) {}
-};
