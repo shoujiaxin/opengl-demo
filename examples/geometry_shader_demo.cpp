@@ -53,25 +53,26 @@ int main() {
     return -1;
   }
 
-  const auto geometry_shader = GeometryShader("../shaders/geometry_shaders/line_strip.geom");
+  const auto geometry_shader = GeometryShader("../shaders/geometry_shaders/house.geom");
 
   const auto program = Program(VertexShader("../shaders/vertex_shaders/line_strip.vert"),
-                               FragmentShader("../shaders/fragment_shaders/color2.frag"));
+                               FragmentShader("../shaders/fragment_shaders/color.frag"));
   program.AttachShader(geometry_shader);
   program.Link();
   program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
   const auto points = std::vector<float>{
-      0.5f,  0.5f,   //
-      -0.5f, 0.5f,   //
-      0.5f,  -0.5f,  //
-      -0.5f, -0.5f,  //
+      0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  //
+      -0.5f, 0.5f,  1.0f, 0.0f, 0.0f,  //
+      0.5f,  -0.5f, 0.0f, 0.0f, 1.0f,  //
+      -0.5f, -0.5f, 1.0f, 1.0f, 0.0f   //
   };
 
   const auto vao = VertexArray();
   const auto vbo = ArrayBuffer(points);
   vao.Bind(vbo);
-  vao.SetAttribute(0, 2, 2 * sizeof(float), 0);
+  vao.SetAttribute(0, 2, 5 * sizeof(float), 0);
+  vao.SetAttribute(1, 3, 5 * sizeof(float), 2 * sizeof(float));
 
   // 渲染循环 (render loop)
   while (!glfwWindowShouldClose(window)) {
