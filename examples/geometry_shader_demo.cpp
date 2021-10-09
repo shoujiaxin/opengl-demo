@@ -53,11 +53,13 @@ int main() {
     return -1;
   }
 
+  const auto vertex_shader = VertexShader("../shaders/vertex_shaders/line_strip.vert");
+  const auto fragment_shader = FragmentShader("../shaders/fragment_shaders/color.frag");
   const auto geometry_shader = GeometryShader("../shaders/geometry_shaders/house.geom");
-
-  const auto program = Program(VertexShader("../shaders/vertex_shaders/line_strip.vert"),
-                               FragmentShader("../shaders/fragment_shaders/color.frag"));
+  const auto program = Program();
+  program.AttachShader(vertex_shader);
   program.AttachShader(geometry_shader);
+  program.AttachShader(fragment_shader);
   program.Link();
   program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
 
