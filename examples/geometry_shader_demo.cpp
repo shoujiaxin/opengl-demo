@@ -112,7 +112,6 @@ int main() {
 
     normal_visualization_program.SetUniform("view", camera.ViewMatrix());
     normal_visualization_program.SetUniform("projection", camera.ProjectionMatrix());
-    normal_visualization_program.SetUniform("viewPos", camera.Position());
 
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -0.5f, 0.0f));

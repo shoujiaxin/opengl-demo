@@ -147,12 +147,20 @@ int main() {
   const auto skybox_program =
       Program("../shaders/vertex_shaders/skybox.vert", "../shaders/fragment_shaders/skybox.frag");
   skybox_program.SetUniform("skybox", 0);
+
   const auto cube_program = Program("../shaders/vertex_shaders/reflection.vert",
                                     "../shaders/fragment_shaders/refraction.frag");
   cube_program.SetUniform("skybox", 0);
+
   const auto model_program = Program("../shaders/vertex_shaders/multiple_lights.vert",
                                      "../shaders/fragment_shaders/model_reflection.frag");
   model_program.SetUniform("skybox", 0);
+
+  const auto normal_visualization_program =
+      Program("../shaders/vertex_shaders/visualizing_normal_vectors.vert",
+              "../shaders/geometry_shaders/visualizing_normal_vectors.geom",
+              "../shaders/fragment_shaders/color2.frag");
+  normal_visualization_program.SetUniform("ourColor", glm::vec3(1.0f, 1.0f, 0.0f));
 
   // 纹理
   const auto skybox_texture = Texture({
@@ -198,6 +206,9 @@ int main() {
     model_program.SetUniform("projection", camera.ProjectionMatrix());
     model_program.SetUniform("viewPos", camera.Position());
 
+    normal_visualization_program.SetUniform("view", camera.ViewMatrix());
+    normal_visualization_program.SetUniform("projection", camera.ProjectionMatrix());
+
     // 绑定纹理
     skybox_texture.BindToUnit(0);
 
@@ -213,12 +224,21 @@ int main() {
     cube_vao.Bind();
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
+    normal_visualization_program.SetUniform("model", glm::mat4(1.0f));
+    normal_visualization_program.SetUniform("model_scale", 1.0f);
+    normal_visualization_program.Use();
+    cube_vao.Bind();
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
     // 绘制模型
     auto model_matrix = glm::mat4(1.0f);
     model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, -0.5f, 0.0f));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
     model_program.SetUniform("model", model_matrix);
     model.Draw(model_program);
+    normal_visualization_program.SetUniform("model", model_matrix);
+    normal_visualization_program.SetUniform("model_scale", 0.1f);
+    model.Draw(normal_visualization_program);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);
