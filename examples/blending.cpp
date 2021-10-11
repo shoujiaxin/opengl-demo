@@ -65,8 +65,8 @@ int main() {
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  const auto program = Program(VertexShader("../shaders/vertex_shaders/depth_testing.vert"),
-                               FragmentShader("../shaders/fragment_shaders/blending.frag"));
+  const auto program = Program("../shaders/vertex_shaders/depth_testing.vert",
+                               "../shaders/fragment_shaders/blending.frag");
   // 使用 GL_TEXTURE0 纹理单元，渲染时将不同的纹理绑定到该单元
   program.SetUniform("texture1", 0);
 

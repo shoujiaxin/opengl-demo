@@ -66,12 +66,11 @@ int main() {
   //  glCullFace(GL_FRONT);  // 需要剔除的面
   //  glFrontFace(GL_CW);    // 需要剔除面的方向
 
-  const auto program = Program(VertexShader("../shaders/vertex_shaders/depth_testing.vert"),
-                               FragmentShader("../shaders/fragment_shaders/depth_testing.frag"));
+  const auto program = Program("../shaders/vertex_shaders/depth_testing.vert",
+                               "../shaders/fragment_shaders/depth_testing.frag");
   program.SetUniform("texture1", 0);
-  const auto screen_program =
-      Program(VertexShader("../shaders/vertex_shaders/framebuffer.vert"),
-              FragmentShader("../shaders/fragment_shaders/framebuffer.frag"));
+  const auto screen_program = Program("../shaders/vertex_shaders/framebuffer.vert",
+                                      "../shaders/fragment_shaders/framebuffer.frag");
   screen_program.SetUniform("screenTexture", 1);
 
   const auto cube_vertices = std::vector<float>{

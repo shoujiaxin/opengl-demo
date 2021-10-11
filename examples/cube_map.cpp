@@ -144,15 +144,14 @@ int main() {
   cube_vao.SetAttribute(1, 3, 6 * sizeof(float), 3 * sizeof(float));
 
   // 着色器程序
-  const auto skybox_program = Program(VertexShader("../shaders/vertex_shaders/skybox.vert"),
-                                      FragmentShader("../shaders/fragment_shaders/skybox.frag"));
+  const auto skybox_program =
+      Program("../shaders/vertex_shaders/skybox.vert", "../shaders/fragment_shaders/skybox.frag");
   skybox_program.SetUniform("skybox", 0);
-  const auto cube_program = Program(VertexShader("../shaders/vertex_shaders/reflection.vert"),
-                                    FragmentShader("../shaders/fragment_shaders/refraction.frag"));
+  const auto cube_program = Program("../shaders/vertex_shaders/reflection.vert",
+                                    "../shaders/fragment_shaders/refraction.frag");
   cube_program.SetUniform("skybox", 0);
-  const auto model_program =
-      Program(VertexShader("../shaders/vertex_shaders/multiple_lights.vert"),
-              FragmentShader("../shaders/fragment_shaders/model_reflection.frag"));
+  const auto model_program = Program("../shaders/vertex_shaders/multiple_lights.vert",
+                                     "../shaders/fragment_shaders/model_reflection.frag");
   model_program.SetUniform("skybox", 0);
 
   // 纹理

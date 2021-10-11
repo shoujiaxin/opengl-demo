@@ -171,9 +171,8 @@ int main() {
   glBindVertexArray(0);
 
   // 着色器程序
-  const auto program =
-      Program(VertexShader("../shaders/vertex_shaders/multiple_lights.vert"),
-              FragmentShader("../shaders/fragment_shaders/my_multiple_lights.frag"));
+  const auto program = Program("../shaders/vertex_shaders/multiple_lights.vert",
+                               "../shaders/fragment_shaders/my_multiple_lights.frag");
   program.Use();
   program.SetUniform("material.shininess", 32.0f);
 
@@ -196,8 +195,8 @@ int main() {
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
   glEnableVertexAttribArray(0);
   glBindVertexArray(0);
-  const auto light_cube_program = Program(VertexShader("../shaders/vertex_shaders/lighting.vert"),
-                                          FragmentShader("../shaders/fragment_shaders/light.frag"));
+  const auto light_cube_program =
+      Program("../shaders/vertex_shaders/lighting.vert", "../shaders/fragment_shaders/light.frag");
   const auto ambient_light = AmbientLight(Color::kWhite, 0.2f);
   const auto sunlight = DirectionalLight(Color::kWhite, 0.2f);
   std::vector<PointLight> point_lights = {};

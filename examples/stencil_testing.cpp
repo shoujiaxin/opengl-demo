@@ -64,11 +64,11 @@ int main() {
   glStencilFunc(GL_NOTEQUAL, 1, 0xff);
   glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-  const auto program = Program(VertexShader("../shaders/vertex_shaders/depth_testing.vert"),
-                               FragmentShader("../shaders/fragment_shaders/depth_testing.frag"));
+  const auto program = Program("../shaders/vertex_shaders/depth_testing.vert",
+                               "../shaders/fragment_shaders/depth_testing.frag");
   program.SetUniform("texture1", 0);
-  const auto outline_program = Program(VertexShader("../shaders/vertex_shaders/depth_testing.vert"),
-                                       FragmentShader("../shaders/fragment_shaders/light.frag"));
+  const auto outline_program = Program("../shaders/vertex_shaders/depth_testing.vert",
+                                       "../shaders/fragment_shaders/light.frag");
 
   const auto cube_vertices = std::vector<float>{
       // ----- 位置 -----, --- 纹理坐标 ---

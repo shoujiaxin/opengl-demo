@@ -61,20 +61,20 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LESS);
 
-  const auto red_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
-                                   FragmentShader("../shaders/fragment_shaders/color2.frag"));
+  const auto red_program = Program("../shaders/vertex_shaders/uniform_buffer.vert",
+                                   "../shaders/fragment_shaders/color2.frag");
   red_program.SetUniform("ourColor", glm::vec3(1.0f, 0.0f, 0.0f));
   red_program.BindUniformBlock("Matrices", 0);
-  const auto green_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
-                                     FragmentShader("../shaders/fragment_shaders/color2.frag"));
+  const auto green_program = Program("../shaders/vertex_shaders/uniform_buffer.vert",
+                                     "../shaders/fragment_shaders/color2.frag");
   green_program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
   green_program.BindUniformBlock("Matrices", 0);
-  const auto blue_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
-                                    FragmentShader("../shaders/fragment_shaders/color2.frag"));
+  const auto blue_program = Program("../shaders/vertex_shaders/uniform_buffer.vert",
+                                    "../shaders/fragment_shaders/color2.frag");
   blue_program.SetUniform("ourColor", glm::vec3(0.0f, 0.0f, 1.0f));
   blue_program.BindUniformBlock("Matrices", 0);
-  const auto yellow_program = Program(VertexShader("../shaders/vertex_shaders/uniform_buffer.vert"),
-                                      FragmentShader("../shaders/fragment_shaders/color2.frag"));
+  const auto yellow_program = Program("../shaders/vertex_shaders/uniform_buffer.vert",
+                                      "../shaders/fragment_shaders/color2.frag");
   yellow_program.SetUniform("ourColor", glm::vec3(1.0f, 1.0f, 0.0f));
   yellow_program.BindUniformBlock("Matrices", 0);
 

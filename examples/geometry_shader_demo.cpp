@@ -61,15 +61,16 @@ int main() {
   glEnable(GL_DEPTH_TEST);
   glDepthFunc(GL_LEQUAL);
 
-  const auto vertex_shader = VertexShader("../shaders/vertex_shaders/explode.vert");
-  const auto geometry_shader = GeometryShader("../shaders/geometry_shaders/explode.geom");
-  const auto fragment_shader = FragmentShader("../shaders/fragment_shaders/model_reflection.frag");
-  const auto program = Program();
-  program.AttachShader(vertex_shader);
-  program.AttachShader(geometry_shader);
-  program.AttachShader(fragment_shader);
-  program.Link();
-  program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
+  const auto program =
+      Program("../shaders/vertex_shaders/explode.vert", "../shaders/geometry_shaders/explode.geom",
+              "../shaders/fragment_shaders/model_reflection.frag");
+  //  program.SetUniform("ourColor", glm::vec3(0.0f, 1.0f, 0.0f));
+
+  const auto normal_visualization_program =
+      Program("../shaders/vertex_shaders/visualizing_normal_vectors.vert",
+              "../shaders/geometry_shaders/visualizing_normal_vectors.geom",
+              "../shaders/fragment_shaders/color2.frag");
+  normal_visualization_program.SetUniform("ourColor", glm::vec3(1.0f, 1.0f, 0.0f));
 
   //  const auto points = std::vector<float>{
   //      0.5f,  0.5f,  0.0f, 1.0f, 0.0f,  //
@@ -106,13 +107,21 @@ int main() {
     program.SetUniform("view", camera.ViewMatrix());
     program.SetUniform("projection", camera.ProjectionMatrix());
     program.SetUniform("viewPos", camera.Position());
-    program.SetUniform("time", static_cast<float>(glfwGetTime()));
+    //    program.SetUniform("time", glfwGetTime());
+    program.SetUniform("time", -M_PI_2);
+
+    normal_visualization_program.SetUniform("view", camera.ViewMatrix());
+    normal_visualization_program.SetUniform("projection", camera.ProjectionMatrix());
+    normal_visualization_program.SetUniform("viewPos", camera.Position());
 
     auto model_matrix = glm::mat4(1.0f);
-    model_matrix = glm::translate(model_matrix, glm::vec3(2.0f, -0.5f, 0.0f));
+    model_matrix = glm::translate(model_matrix, glm::vec3(0.0f, -0.5f, 0.0f));
     model_matrix = glm::scale(model_matrix, glm::vec3(0.1f));
     program.SetUniform("model", model_matrix);
     model.Draw(program);
+    normal_visualization_program.SetUniform("model", model_matrix);
+    normal_visualization_program.SetUniform("model_scale", 0.1f);
+    model.Draw(normal_visualization_program);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);

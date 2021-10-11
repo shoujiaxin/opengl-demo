@@ -6,13 +6,25 @@
 
 #include "glad/glad.h"
 #include "glm/gtc/type_ptr.hpp"
+#include "shader/fragment_shader.h"
+#include "shader/geometry_shader.h"
+#include "shader/vertex_shader.h"
 #include "spdlog/spdlog.h"
 
 Program::Program() : Identifiable<unsigned int>(glCreateProgram()) {}
 
-Program::Program(const Shader &vertex_shader, const Shader &fragment_shader) : Program() {
-  AttachShader(vertex_shader);
-  AttachShader(fragment_shader);
+Program::Program(const std::string &vertex_shader, const std::string &fragment_shader) : Program() {
+  AttachShader(VertexShader(vertex_shader));
+  AttachShader(FragmentShader(fragment_shader));
+  Link();
+}
+
+Program::Program(const std::string &vertex_shader, const std::string &geometry_shader,
+                 const std::string &fragment_shader)
+    : Program() {
+  AttachShader(VertexShader(vertex_shader));
+  AttachShader(GeometryShader(geometry_shader));
+  AttachShader(FragmentShader(fragment_shader));
   Link();
 }
 
@@ -47,6 +59,11 @@ void Program::SetUniform(const std::string &name, bool value) const {
 void Program::SetUniform(const std::string &name, float value) const {
   Use();
   glUniform1f(glGetUniformLocation(id_, name.c_str()), value);
+}
+
+void Program::SetUniform(const std::string &name, double value) const {
+  Use();
+  glUniform1f(glGetUniformLocation(id_, name.c_str()), static_cast<float>(value));
 }
 
 void Program::SetUniform(const std::string &name, int value) const {

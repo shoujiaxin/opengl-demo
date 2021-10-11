@@ -4,16 +4,18 @@
 
 #pragma once
 
-#include "fragment_shader.h"
 #include "glm/glm.hpp"
 #include "interface/identifiable.h"
-#include "vertex_shader.h"
+#include "shader.h"
 
 class Program final : public Identifiable<unsigned int> {
  public:
   Program();
 
-  Program(const Shader& vertex_shader, const Shader& fragment_shader);
+  Program(const std::string& vertex_shader, const std::string& fragment_shader);
+
+  Program(const std::string& vertex_shader, const std::string& geometry_shader,
+          const std::string& fragment_shader);
 
   ~Program();
 
@@ -28,6 +30,8 @@ class Program final : public Identifiable<unsigned int> {
   void SetUniform(const std::string& name, bool value) const;
 
   void SetUniform(const std::string& name, float value) const;
+
+  void SetUniform(const std::string& name, double value) const;
 
   void SetUniform(const std::string& name, int value) const;
 
