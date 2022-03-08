@@ -4,16 +4,18 @@
 // clang-format on
 
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "buffer/array_buffer.h"
 #include "buffer/vertex_array.h"
 #include "shader/program.h"
+#include "util/bezier_path.h"
 
 #define SCR_WIDTH 1200
 #define SCR_HEIGHT 800
 
-std::vector<float> points_vertices;
+BezierPath path;
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
@@ -25,8 +27,8 @@ void CursorPosCallback(GLFWwindow* window, double x, double y) {
     auto height = 0;
     glfwGetWindowSize(window, &width, &height);
 
-    points_vertices.emplace_back(2 * x / width - 1);
-    points_vertices.emplace_back(1 - 2 * y / height);
+    path.AddCurveTo({2 * x / width - 1, 1 - 2 * y / height},
+                    {2 * x / width - 1, 1 - 2 * y / height});
   }
 }
 
@@ -78,10 +80,15 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const auto guard = BindGuard(vao);
-    vbo.SetData(points_vertices);
+    std::vector<float> vertices;
+    for (const auto& p : path.GetPoints()) {
+      vertices.emplace_back(p.x_);
+      vertices.emplace_back(p.y_);
+    }
+    vbo.SetData(vertices);
 
     paint_program.Use();
-    glDrawArrays(GL_POINTS, 0, static_cast<int>(points_vertices.size()) / 2);
+    glDrawArrays(GL_POINTS, 0, static_cast<int>(vertices.size()) / 2);
 
     // 交换颜色缓冲
     glfwSwapBuffers(window);
