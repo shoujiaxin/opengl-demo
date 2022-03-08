@@ -53,3 +53,6 @@ target_link_libraries(AdvancedGLSL glfw glad assimp spdlog)
 
 add_executable(GeometryShader examples/geometry_shader_demo.cpp ${SOURCE_FILES})
 target_link_libraries(GeometryShader glfw glad assimp spdlog)
+
+add_executable(Paint examples/paint.cpp ${SOURCE_FILES})
+target_link_libraries(Paint glfw glad assimp spdlog)
