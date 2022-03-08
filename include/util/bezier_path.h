@@ -15,9 +15,11 @@ struct Point {
 
 class BezierPath final {
  public:
+  void MoveTo(const Point& point);
+
   void AddCurveTo(const Point& end_point, const Point& control_point);
 
-  const std::vector<Point>& GetPoints() const;
+  [[nodiscard]] const std::vector<Point>& GetPoints() const;
 
  private:
   std::vector<Point> points_;

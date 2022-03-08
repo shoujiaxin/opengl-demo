@@ -16,19 +16,30 @@
 #define SCR_HEIGHT 800
 
 BezierPath path;
+std::unique_ptr<Point> previous_cursor;
+std::unique_ptr<Point> current_cursor;
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
   glViewport(0, 0, width, height);
 }
 
 void CursorPosCallback(GLFWwindow* window, double x, double y) {
-  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-    auto width = 0;
-    auto height = 0;
-    glfwGetWindowSize(window, &width, &height);
+  auto width = 0;
+  auto height = 0;
+  glfwGetWindowSize(window, &width, &height);
+  previous_cursor = std::move(current_cursor);
+  current_cursor = std::make_unique<Point>(2 * x / width - 1, 1 - 2 * y / height);
 
-    path.AddCurveTo({2 * x / width - 1, 1 - 2 * y / height},
-                    {2 * x / width - 1, 1 - 2 * y / height});
+  if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    if (path.GetPoints().empty()) {
+      path.MoveTo(*current_cursor);
+      return;
+    }
+
+    const auto to = Point((previous_cursor->x_ + current_cursor->x_) / 2,
+                          (previous_cursor->y_ + current_cursor->y_) / 2);
+    const auto control = *previous_cursor;
+    path.AddCurveTo(to, control);
   }
 }
 
@@ -63,7 +74,7 @@ int main() {
 
   const auto paint_program =
       Program("../shaders/vertex_shaders/paint.vert", "../shaders/fragment_shaders/paint.frag");
-  paint_program.SetUniform("size", 10.0f);
+  paint_program.SetUniform("size", 20.0f);
 
   // 轨迹点
   const auto vao = VertexArray();
